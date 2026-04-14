@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LifeWorks.Application/LifeWorks.Application.csproj" />
+    <Project Path="src/LifeWorks.Domain/LifeWorks.Domain.csproj" />
+    <Project Path="src/LifeWorks.Infrastructure/LifeWorks.Infrastructure.csproj" />
+    <Project Path="src/LifeWorks.Web/LifeWorks.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LifeWorks.Application.Tests/LifeWorks.Application.Tests.csproj" />
+    <Project Path="tests/LifeWorks.Domain.Tests/LifeWorks.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
