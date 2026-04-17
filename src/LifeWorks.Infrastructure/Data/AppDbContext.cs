@@ -92,7 +92,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             {
                 Id = new Guid($"22222222-0000-0000-0000-{index++:D12}"),
                 Name = c.Item1,
-                SortOrder = c.Item2
+                SortOrder = c.Item2,
+                IsSeeded = true
             }).ToArray()
         );
     }
