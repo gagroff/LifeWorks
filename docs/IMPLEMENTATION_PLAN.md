@@ -141,7 +141,7 @@
 
 ### 3.1 — Global Imports
 
-- [ ] Add to `src/LifeWorks.Web/Components/_Imports.razor`:
+- [x] Add to `src/LifeWorks.Web/Components/_Imports.razor`:
   ```
   @using LifeWorks.Application.Services
   @using LifeWorks.Domain.Entities
@@ -150,28 +150,28 @@
 
 ### 3.2 — Categories List Page
 
-- [ ] Create `src/LifeWorks.Web/Components/Pages/Settings/Categories.razor` (`@page "/settings/categories"`)
-- [ ] Inject `ICategoryService` and `ISnackbar`
-- [ ] Load categories in `OnInitializedAsync`; show `MudProgressCircular` while loading
-- [ ] Render `MudTable` with columns: **Name**, **Sort Order**, **Seeded** (icon), **Actions**
-- [ ] Show empty-state message when no categories exist
+- [x] Create `src/LifeWorks.Web/Components/Pages/Settings/Categories.razor` (`@page "/settings/categories"`)
+- [x] Inject `ICategoryService` and `ISnackbar`
+- [x] Load categories in `OnInitializedAsync`; show `MudProgressCircular` while loading
+- [x] Render `MudTable` with columns: **Name**, **Sort Order**, **Seeded** (icon), **Actions**
+- [x] Show empty-state message when no categories exist
 
 ### 3.3 — Add Category
 
-- [ ] "Add Category" `MudButton` above the table
-- [ ] `MudDialog` with **Name** (required, max 100) and **Sort Order** (required, int) fields
-- [ ] On submit: call `AddAsync`, refresh list, show snackbar "Category added"
+- [x] "Add Category" `MudButton` above the table
+- [x] `MudDialog` with **Name** (required, max 100) and **Sort Order** (required, int) fields
+- [x] On submit: call `AddAsync`, refresh list, show snackbar "Category added"
 
 ### 3.4 — Edit Category
 
-- [ ] Edit icon button per row opens a dialog (same pattern as Add) pre-populated with current values
-- [ ] On save: call `UpdateAsync`, refresh list, show snackbar "Category updated"
+- [x] Edit icon button per row opens a dialog (same pattern as Add) pre-populated with current values
+- [x] On save: call `UpdateAsync`, refresh list, show snackbar "Category updated"
 
 ### 3.5 — Delete Category
 
-- [ ] Delete button: disabled with tooltip for seeded categories; check `CanDeleteAsync` for in-use categories
-- [ ] `MudMessageBox` confirmation before deletion
-- [ ] On success: remove from list, show snackbar; on `false` return: show error snackbar
+- [x] Delete button: disabled with tooltip for seeded categories; check `CanDeleteAsync` for in-use categories
+- [x] `MudMessageBox` confirmation before deletion
+- [x] On success: remove from list, show snackbar; on `false` return: show error snackbar
 
 ### Phase 3 Verification
 
@@ -179,7 +179,7 @@
 - [ ] Add a custom category — appears in list
 - [ ] Edit a custom category — changes save correctly
 - [ ] Delete custom category — succeeds; delete seeded category — blocked
-- [ ] `dotnet build` — zero errors
+- [x] `dotnet build` — zero errors
 - [ ] Commit on branch `feature/phase-3-categories`, PR passes CI, merge
 
 ---
