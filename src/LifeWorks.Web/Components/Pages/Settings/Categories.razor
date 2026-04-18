@@ -1,0 +1,153 @@
+@page "/settings/categories"
+@inject ICategoryService CategoryService
+@inject ISnackbar Snackbar
+
+<PageTitle>Categories</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Categories</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+           OnClick="OpenAddDialog" Class="mb-4">
+    Add Category
+</MudButton>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_categories.Count == 0)
+{
+    <MudText>No categories found.</MudText>
+}
+else
+{
+    <MudTable Items="_categories" Hover="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Sort Order</MudTh>
+            <MudTh>Seeded</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.SortOrder</MudTd>
+            <MudTd>
+                @if (context.IsSeeded)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Lock" Title="Seeded" Color="Color.Default" />
+                }
+            </MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               OnClick="() => OpenEditDialog(context)" />
+                @if (context.IsSeeded)
+                {
+                    <MudTooltip Text="Seeded categories cannot be deleted">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="true" />
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                   OnClick="() => DeleteCategory(context)" />
+                }
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+<MudDialog @bind-Visible="_dialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">@(_editingCategory?.Id == Guid.Empty ? "Add Category" : "Edit Category")</MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="_editingCategory" OnValidSubmit="SaveCategory">
+            <DataAnnotationsValidator />
+            <MudTextField @bind-Value="_editingCategory!.Name" Label="Name" Required="true"
+                          For="() => _editingCategory!.Name" Class="mb-3" />
+            <MudNumericField @bind-Value="_editingCategory!.SortOrder" Label="Sort Order" Required="true"
+                             For="() => _editingCategory!.SortOrder" />
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
+                       Class="mt-4">Save</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="CloseDialog" Class="mt-4 ml-2">Cancel</MudButton>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private List<Category> _categories = [];
+    private bool _loading = true;
+    private bool _dialogVisible;
+    private Category? _editingCategory;
+
+    private readonly DialogOptions _dialogOptions = new() { CloseOnEscapeKey = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        _loading = true;
+        _categories = await CategoryService.GetAllAsync();
+        _loading = false;
+    }
+
+    private void OpenAddDialog()
+    {
+        _editingCategory = new Category { Id = Guid.Empty };
+        _dialogVisible = true;
+    }
+
+    private void OpenEditDialog(Category category)
+    {
+        _editingCategory = new Category
+        {
+            Id = category.Id,
+            Name = category.Name,
+            SortOrder = category.SortOrder,
+            IsSeeded = category.IsSeeded
+        };
+        _dialogVisible = true;
+    }
+
+    private void CloseDialog()
+    {
+        _dialogVisible = false;
+        _editingCategory = null;
+    }
+
+    private async Task SaveCategory()
+    {
+        if (_editingCategory is null) return;
+
+        if (_editingCategory.Id == Guid.Empty)
+        {
+            await CategoryService.AddAsync(_editingCategory);
+            Snackbar.Add("Category added", Severity.Success);
+        }
+        else
+        {
+            await CategoryService.UpdateAsync(_editingCategory);
+            Snackbar.Add("Category updated", Severity.Success);
+        }
+
+        CloseDialog();
+        await LoadCategories();
+    }
+
+    private async Task DeleteCategory(Category category)
+    {
+        var success = await CategoryService.DeleteAsync(category.Id);
+        if (success)
+        {
+            _categories.Remove(category);
+            Snackbar.Add("Category deleted", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Cannot delete this category — it may be in use.", Severity.Error);
+        }
+    }
+}
