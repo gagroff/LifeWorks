@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# C# language server cache files
+*.lscache
+
 # User-specific files
 *.rsuser
 *.suo
