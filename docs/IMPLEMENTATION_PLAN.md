@@ -22,28 +22,28 @@
 
 ### 1.1 — Add `IsSeeded` to Category Entity
 
-- [ ] Add `public bool IsSeeded { get; set; }` to `src/LifeWorks.Domain/Entities/Category.cs`
+- [x] Add `public bool IsSeeded { get; set; }` to `src/LifeWorks.Domain/Entities/Category.cs`
 
 ### 1.2 — Update DbContext
 
-- [ ] In `src/LifeWorks.Infrastructure/Data/AppDbContext.cs`, set `IsSeeded = true` on all 12 seeded `Category` objects in `OnModelCreating`
+- [x] In `src/LifeWorks.Infrastructure/Data/AppDbContext.cs`, set `IsSeeded = true` on all 12 seeded `Category` objects in `OnModelCreating`
 
 ### 1.3 — Create Initial EF Core Migration
 
-- [ ] Run: `dotnet ef migrations add InitialCreate --project src/LifeWorks.Infrastructure --startup-project src/LifeWorks.Web`
-- [ ] Verify migration file created at `src/LifeWorks.Infrastructure/Migrations/` with `CREATE TABLE` for all 4 entities
+- [x] Run: `dotnet ef migrations add InitialCreate --project src/LifeWorks.Infrastructure --startup-project src/LifeWorks.Web`
+- [x] Verify migration file created at `src/LifeWorks.Infrastructure/Migrations/` with `CREATE TABLE` for all 4 entities
 
 ### 1.4 — Apply Migration on Startup
 
-- [ ] In `src/LifeWorks.Web/Program.cs`, add a startup block after `var app = builder.Build()` that calls `context.Database.MigrateAsync()` using a scoped `AppDbContext`
+- [x] In `src/LifeWorks.Web/Program.cs`, add a startup block after `var app = builder.Build()` that calls `context.Database.MigrateAsync()` using a scoped `AppDbContext`
 
 ### Phase 1 Verification
 
-- [ ] `dotnet build` — zero errors, zero warnings
+- [x] `dotnet build` — zero errors, zero warnings
 - [ ] `dotnet run --project src/LifeWorks.Web` — app starts, no startup exceptions
 - [ ] Database `LifeWorks` exists in LocalDB with 4 tables; `Categories` table has 12 rows with `IsSeeded = 1`
-- [ ] `dotnet test` — all tests pass
-- [ ] Commit on branch `feature/phase-1-infrastructure`, PR passes CI, merge
+- [x] `dotnet test` — all tests pass
+- [x] Commit on branch `feature/phase-1-infrastructure`, PR passes CI, merge
 
 ---
 
@@ -53,7 +53,7 @@
 
 ### 2.1 — Generic Repository Interface
 
-- [ ] Create `src/LifeWorks.Application/Repositories/IRepository.cs`:
+- [x] Create `src/LifeWorks.Application/Repositories/IRepository.cs`:
   ```csharp
   Task<List<T>> GetAllAsync();
   Task<T?> GetByIdAsync(Guid id);
@@ -65,72 +65,72 @@
 
 ### 2.2 — Entity-Specific Repository Interfaces
 
-- [ ] Create `src/LifeWorks.Application/Repositories/ICategoryRepository.cs` extending `IRepository<Category>`:
+- [x] Create `src/LifeWorks.Application/Repositories/ICategoryRepository.cs` extending `IRepository<Category>`:
   - `Task<List<Category>> GetAllOrderedAsync()` — ordered by SortOrder, then Name
   - `Task<bool> HasLinkedImprovementsAsync(Guid categoryId)`
-- [ ] Create `src/LifeWorks.Application/Repositories/IContractorRepository.cs` extending `IRepository<Contractor>`:
+- [x] Create `src/LifeWorks.Application/Repositories/IContractorRepository.cs` extending `IRepository<Contractor>`:
   - `Task<List<Contractor>> SearchAsync(string? searchTerm)`
   - `Task<int> GetLinkedImprovementCountAsync(Guid contractorId)`
-- [ ] Create `src/LifeWorks.Application/Repositories/IHomeImprovementRepository.cs` extending `IRepository<HomeImprovement>`:
+- [x] Create `src/LifeWorks.Application/Repositories/IHomeImprovementRepository.cs` extending `IRepository<HomeImprovement>`:
   - `Task<List<HomeImprovement>> GetFilteredAsync(HomeImprovementFilter filter)`
   - `Task<HomeImprovement?> GetWithDetailsAsync(Guid id)` — includes Property, Category, Contractor
   - `Task<decimal> GetTotalCostAsync(HomeImprovementFilter filter)`
-- [ ] Create `src/LifeWorks.Application/Repositories/IPropertyRepository.cs` extending `IRepository<Property>`
+- [x] Create `src/LifeWorks.Application/Repositories/IPropertyRepository.cs` extending `IRepository<Property>`
 
 ### 2.3 — EF Core Repository Implementations (Infrastructure)
 
-- [ ] Create `src/LifeWorks.Infrastructure/Repositories/RepositoryBase.cs` — generic base implementing `IRepository<T>` using `AppDbContext`
-- [ ] Create `src/LifeWorks.Infrastructure/Repositories/CategoryRepository.cs` implementing `ICategoryRepository`
-- [ ] Create `src/LifeWorks.Infrastructure/Repositories/ContractorRepository.cs` implementing `IContractorRepository`:
+- [x] Create `src/LifeWorks.Infrastructure/Repositories/RepositoryBase.cs` — generic base implementing `IRepository<T>` using `AppDbContext`
+- [x] Create `src/LifeWorks.Infrastructure/Repositories/CategoryRepository.cs` implementing `ICategoryRepository`
+- [x] Create `src/LifeWorks.Infrastructure/Repositories/ContractorRepository.cs` implementing `IContractorRepository`:
   - `SearchAsync` — filters `Name.Contains(term)` OR `CompanyName.Contains(term)`
-- [ ] Create `src/LifeWorks.Infrastructure/Repositories/HomeImprovementRepository.cs` implementing `IHomeImprovementRepository`:
+- [x] Create `src/LifeWorks.Infrastructure/Repositories/HomeImprovementRepository.cs` implementing `IHomeImprovementRepository`:
   - `GetFilteredAsync` — applies PropertyId, CategoryId, DateFrom, DateTo predicates; includes nav properties; `OrderByDescending(DateCompleted)`
   - `GetTotalCostAsync` — same filter predicates, sums `Cost` (null = 0)
-- [ ] Create `src/LifeWorks.Infrastructure/Repositories/PropertyRepository.cs` implementing `IPropertyRepository`
+- [x] Create `src/LifeWorks.Infrastructure/Repositories/PropertyRepository.cs` implementing `IPropertyRepository`
 
 ### 2.4 — Application Models
 
-- [ ] Create `src/LifeWorks.Application/Models/HomeImprovementFilter.cs` with `PropertyId?`, `CategoryId?`, `DateFrom?` (DateOnly), `DateTo?` (DateOnly)
+- [x] Create `src/LifeWorks.Application/Models/HomeImprovementFilter.cs` with `PropertyId?`, `CategoryId?`, `DateFrom?` (DateOnly), `DateTo?` (DateOnly)
 
 ### 2.5 — Application Services
 
-- [ ] Create `src/LifeWorks.Application/Services/ICategoryService.cs`:
+- [x] Create `src/LifeWorks.Application/Services/ICategoryService.cs`:
   - `Task<List<Category>> GetAllAsync()`
   - `Task<Category?> GetByIdAsync(Guid id)`
   - `Task AddAsync(Category category)`
   - `Task UpdateAsync(Category category)`
   - `Task<bool> DeleteAsync(Guid id)` — returns `false` if seeded or in use
   - `Task<bool> CanDeleteAsync(Guid id)`
-- [ ] Create `src/LifeWorks.Application/Services/CategoryService.cs` — injects `ICategoryRepository`; `AddAsync` sets new `Guid` Id, `IsSeeded = false`
-- [ ] Create `src/LifeWorks.Application/Services/IContractorService.cs`:
+- [x] Create `src/LifeWorks.Application/Services/CategoryService.cs` — injects `ICategoryRepository`; `AddAsync` sets new `Guid` Id, `IsSeeded = false`
+- [x] Create `src/LifeWorks.Application/Services/IContractorService.cs`:
   - `Task<List<Contractor>> GetAllAsync(string? searchTerm = null)`
   - `Task<Contractor?> GetByIdAsync(Guid id)`
   - `Task<int> GetLinkedImprovementCountAsync(Guid contractorId)`
   - `Task AddAsync(Contractor contractor)`
   - `Task UpdateAsync(Contractor contractor)`
   - `Task<bool> DeleteAsync(Guid id)` — returns `false` if linked improvements exist
-- [ ] Create `src/LifeWorks.Application/Services/ContractorService.cs` — injects `IContractorRepository`; `AddAsync`/`UpdateAsync` set `CreatedAt`/`UpdatedAt`
-- [ ] Create `src/LifeWorks.Application/Services/IHomeImprovementService.cs`:
+- [x] Create `src/LifeWorks.Application/Services/ContractorService.cs` — injects `IContractorRepository`; `AddAsync`/`UpdateAsync` set `CreatedAt`/`UpdatedAt`
+- [x] Create `src/LifeWorks.Application/Services/IHomeImprovementService.cs`:
   - `Task<List<HomeImprovement>> GetAllAsync(HomeImprovementFilter? filter = null)`
   - `Task<HomeImprovement?> GetByIdAsync(Guid id)`
   - `Task AddAsync(HomeImprovement improvement)`
   - `Task UpdateAsync(HomeImprovement improvement)`
   - `Task DeleteAsync(Guid id)`
   - `Task<decimal> GetTotalCostAsync(HomeImprovementFilter? filter = null)`
-- [ ] Create `src/LifeWorks.Application/Services/HomeImprovementService.cs` — injects `IHomeImprovementRepository`
-- [ ] Create `src/LifeWorks.Application/Services/IPropertyService.cs` with `Task<List<Property>> GetAllAsync()`
-- [ ] Create `src/LifeWorks.Application/Services/PropertyService.cs` — injects `IPropertyRepository`
+- [x] Create `src/LifeWorks.Application/Services/HomeImprovementService.cs` — injects `IHomeImprovementRepository`
+- [x] Create `src/LifeWorks.Application/Services/IPropertyService.cs` with `Task<List<Property>> GetAllAsync()`
+- [x] Create `src/LifeWorks.Application/Services/PropertyService.cs` — injects `IPropertyRepository`
 
 ### 2.6 — DI Registration
 
-- [ ] Create `src/LifeWorks.Infrastructure/DependencyInjection.cs` with `AddInfrastructure(this IServiceCollection services)` registering all 4 repository implementations as `Scoped`
-- [ ] Create `src/LifeWorks.Application/DependencyInjection.cs` with `AddApplicationServices(this IServiceCollection services)` registering all 4 services as `Scoped`
-- [ ] In `src/LifeWorks.Web/Program.cs`, call both: `builder.Services.AddInfrastructure()` and `builder.Services.AddApplicationServices()`
+- [x] Create `src/LifeWorks.Infrastructure/DependencyInjection.cs` with `AddInfrastructure(this IServiceCollection services)` registering all 4 repository implementations as `Scoped`
+- [x] Create `src/LifeWorks.Application/DependencyInjection.cs` with `AddApplicationServices(this IServiceCollection services)` registering all 4 services as `Scoped`
+- [x] In `src/LifeWorks.Web/Program.cs`, call both: `builder.Services.AddInfrastructure()` and `builder.Services.AddApplicationServices()`
 
 ### Phase 2 Verification
 
-- [ ] `dotnet build` — zero errors
-- [ ] `dotnet test` — all tests pass
+- [x] `dotnet build` — zero errors
+- [x] `dotnet test` — all tests pass
 - [ ] Commit on branch `feature/phase-2-repositories-services`, PR passes CI, merge
 
 ---

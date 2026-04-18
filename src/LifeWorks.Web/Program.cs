@@ -1,3 +1,5 @@
+using LifeWorks.Application;
+using LifeWorks.Infrastructure;
 using LifeWorks.Infrastructure.Data;
 using LifeWorks.Web.Components;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,9 @@ builder.Services.AddMudServices();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddInfrastructure();
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
