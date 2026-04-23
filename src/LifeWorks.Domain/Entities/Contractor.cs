@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace LifeWorks.Domain.Entities;
 
 public class Contractor
 {
     public Guid Id { get; set; }
+    [Required]
+    [MaxLength(200)]
     public string Name { get; set; } = string.Empty;
     public string? CompanyName { get; set; }
     public string? Phone { get; set; }

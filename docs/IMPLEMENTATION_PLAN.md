@@ -190,36 +190,36 @@
 
 ### 4.1 — Contractors List Page
 
-- [ ] Create `src/LifeWorks.Web/Components/Pages/Contractors/Index.razor` (`@page "/contractors"`)
-- [ ] Search `MudTextField` with debounce (`DebounceInterval="300"`) — reloads list via `GetAllAsync(searchTerm)`
-- [ ] `MudTable` columns: **Name**, **Company**, **Phone**, **Email**, **# Improvements**, **Actions** (View / Edit / Delete)
-- [ ] Empty-state message and loading spinner
+- [x] Create `src/LifeWorks.Web/Components/Pages/Contractors/Index.razor` (`@page "/contractors"`)
+- [x] Search `MudTextField` with debounce (`DebounceInterval="300"`) — reloads list via `GetAllAsync(searchTerm)`
+- [x] `MudTable` columns: **Name**, **Company**, **Phone**, **Email**, **# Improvements**, **Actions** (View / Edit / Delete)
+- [x] Empty-state message and loading spinner
 
 ### 4.2 — Contractor Create / Edit Form
 
-- [ ] Create `src/LifeWorks.Web/Components/Pages/Contractors/ContractorForm.razor` (`@page "/contractors/new"`, `@page "/contractors/{Id:guid}/edit"`)
-- [ ] In edit mode, load existing contractor via `GetByIdAsync(Id)`
-- [ ] Fields: Name (required), Company Name, Phone, Email, Website, Notes (multiline)
-- [ ] Submit: calls `AddAsync` or `UpdateAsync`, navigates to `/contractors` with snackbar
-- [ ] `EditForm` with `DataAnnotationsValidator`; add `[Required][MaxLength(200)]` to `Contractor.Name`
+- [x] Create `src/LifeWorks.Web/Components/Pages/Contractors/ContractorForm.razor` (`@page "/contractors/new"`, `@page "/contractors/{Id:guid}/edit"`)
+- [x] In edit mode, load existing contractor via `GetByIdAsync(Id)`
+- [x] Fields: Name (required), Company Name, Phone, Email, Website, Notes (multiline)
+- [x] Submit: calls `AddAsync` or `UpdateAsync`, navigates to `/contractors` with snackbar
+- [x] `EditForm` with `DataAnnotationsValidator`; add `[Required][MaxLength(200)]` to `Contractor.Name`
 
 ### 4.3 — Contractor Detail View
 
-- [ ] Create `src/LifeWorks.Web/Components/Pages/Contractors/ContractorDetail.razor` (`@page "/contractors/{Id:guid}"`)
-- [ ] `MudCard` read-only display of all fields; **Edit** and **Back** buttons
+- [x] Create `src/LifeWorks.Web/Components/Pages/Contractors/ContractorDetail.razor` (`@page "/contractors/{Id:guid}"`)
+- [x] `MudCard` read-only display of all fields; **Edit** and **Back** buttons
 
 ### 4.4 — Delete Contractor
 
-- [ ] Delete button on list: check `GetLinkedImprovementCountAsync`
-  - If > 0: show blocked message "Linked to {n} improvement record(s) — cannot delete"
-  - If 0: show `MudMessageBox` confirmation, then call `DeleteAsync`, refresh list, show snackbar
+- [x] Delete button on list: check `GetLinkedImprovementCountAsync`
+  - [x] If > 0: show blocked message "Linked to {n} improvement record(s) — cannot delete"
+  - [x] If 0: show `MudMessageBox` confirmation, then call `DeleteAsync`, refresh list, show snackbar
 
 ### Phase 4 Verification
 
 - [ ] Create, edit, view, and delete a contractor
 - [ ] Search filters list by name and company
 - [ ] Delete blocked when contractor has linked improvements
-- [ ] `dotnet build` — zero errors
+- [x] `dotnet build` — zero errors
 - [ ] Commit on branch `feature/phase-4-contractors`, PR passes CI, merge
 
 ---

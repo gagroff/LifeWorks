@@ -1,0 +1,74 @@
+@page "/contractors/{Id:guid}"
+@inject IContractorService ContractorService
+@inject NavigationManager Navigation
+
+<PageTitle>Contractor Details</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Contractor Details</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_contractor is null)
+{
+    <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-4">
+        Contractor not found.
+    </MudAlert>
+
+    <MudButton Variant="Variant.Text" OnClick="BackToList">
+        Back
+    </MudButton>
+}
+else
+{
+    <MudCard>
+        <MudCardContent>
+            <MudText Typo="Typo.h6" Class="mb-2">@_contractor.Name</MudText>
+
+            <MudText Class="mb-1"><strong>Company:</strong> @DisplayOrDash(_contractor.CompanyName)</MudText>
+            <MudText Class="mb-1"><strong>Phone:</strong> @DisplayOrDash(_contractor.Phone)</MudText>
+            <MudText Class="mb-1"><strong>Email:</strong> @DisplayOrDash(_contractor.Email)</MudText>
+            <MudText Class="mb-1"><strong>Website:</strong> @DisplayOrDash(_contractor.Website)</MudText>
+            <MudText Class="mb-1"><strong>Notes:</strong> @DisplayOrDash(_contractor.Notes)</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="EditContractor">
+                Edit
+            </MudButton>
+            <MudButton Variant="Variant.Text" OnClick="BackToList">
+                Back
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private Contractor? _contractor;
+    private bool _loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _contractor = await ContractorService.GetByIdAsync(Id);
+        _loading = false;
+    }
+
+    private void EditContractor()
+    {
+        Navigation.NavigateTo($"/contractors/{Id}/edit");
+    }
+
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/contractors");
+    }
+
+    private static string DisplayOrDash(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "-" : value;
+}
