@@ -1,0 +1,131 @@
+@page "/contractors/new"
+@page "/contractors/{Id:guid}/edit"
+@inject IContractorService ContractorService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>@(_isEditMode ? "Edit Contractor" : "New Contractor")</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">@(_isEditMode ? "Edit Contractor" : "New Contractor")</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Name"
+                              Label="Name"
+                              Required="true"
+                              For="() => _model.Name"
+                              Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.CompanyName"
+                              Label="Company Name"
+                              For="() => _model.CompanyName"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Phone"
+                              Label="Phone"
+                              For="() => _model.Phone"
+                              Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Email"
+                              Label="Email"
+                              For="() => _model.Email"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_model.Website"
+                              Label="Website"
+                              For="() => _model.Website"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_model.Notes"
+                              Label="Notes"
+                              For="() => _model.Notes"
+                              Lines="4"
+                              Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Row="true" Spacing="2" Class="mt-4">
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Save
+            </MudButton>
+            <MudButton Variant="Variant.Text"
+                       OnClick="BackToList">
+                Cancel
+            </MudButton>
+        </MudStack>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private Contractor _model = new();
+    private bool _loading = true;
+    private bool _isEditMode;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _isEditMode = Id.HasValue;
+
+        if (_isEditMode)
+        {
+            var existing = await ContractorService.GetByIdAsync(Id!.Value);
+            if (existing is null)
+            {
+                Snackbar.Add("Contractor not found.", Severity.Error);
+                Navigation.NavigateTo("/contractors");
+                return;
+            }
+
+            _model = existing;
+        }
+        else
+        {
+            _model = new Contractor();
+        }
+
+        _loading = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_isEditMode)
+        {
+            await ContractorService.UpdateAsync(_model);
+            Snackbar.Add("Contractor updated", Severity.Success);
+        }
+        else
+        {
+            await ContractorService.AddAsync(_model);
+            Snackbar.Add("Contractor added", Severity.Success);
+        }
+
+        Navigation.NavigateTo("/contractors");
+    }
+
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/contractors");
+    }
+}

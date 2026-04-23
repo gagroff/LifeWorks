@@ -1,0 +1,169 @@
+@page "/contractors"
+@inject IContractorService ContractorService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Contractors</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Contractors</MudText>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-4">
+    <MudTextField T="string"
+                  Label="Search by name or company"
+                  Value="_searchTerm"
+                  ValueChanged="OnSearchValueChanged"
+                  Immediate="true"
+                  DebounceInterval="300"
+                  OnDebounceIntervalElapsed="OnSearchDebounced"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Clearable="true"
+                  Class="w-100" />
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Href="/contractors/new">
+        New Contractor
+    </MudButton>
+</MudStack>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_rows.Count == 0)
+{
+    <MudText>No contractors found.</MudText>
+}
+else
+{
+    <MudTable Items="_rows" Hover="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Company</MudTh>
+            <MudTh>Phone</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh># Improvements</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Contractor.Name</MudTd>
+            <MudTd>@(string.IsNullOrWhiteSpace(context.Contractor.CompanyName) ? "-" : context.Contractor.CompanyName)</MudTd>
+            <MudTd>@(string.IsNullOrWhiteSpace(context.Contractor.Phone) ? "-" : context.Contractor.Phone)</MudTd>
+            <MudTd>@(string.IsNullOrWhiteSpace(context.Contractor.Email) ? "-" : context.Contractor.Email)</MudTd>
+            <MudTd>@context.LinkedImprovementCount</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                               Color="Color.Primary"
+                               OnClick="() => ViewContractor(context.Contractor.Id)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               Color="Color.Secondary"
+                               OnClick="() => EditContractor(context.Contractor.Id)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                               Color="Color.Error"
+                               OnClick="() => DeleteContractorAsync(context)" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+<MudMessageBox Title="Delete Contractor"
+               Message="@_deleteMessage"
+               YesText="Delete"
+               CancelText="Cancel"
+               @bind-Visible="_deleteDialogVisible"
+               OnYes="ConfirmDeleteAsync"
+               OnCancel="CancelDelete" />
+
+@code {
+    private List<ContractorListRow> _rows = [];
+    private string? _searchTerm;
+    private bool _loading = true;
+    private bool _deleteDialogVisible;
+    private ContractorListRow? _pendingDeleteRow;
+    private string _deleteMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadContractorsAsync(_searchTerm);
+    }
+
+    private Task OnSearchValueChanged(string? value)
+    {
+        _searchTerm = value;
+        return Task.CompletedTask;
+    }
+
+    private async Task OnSearchDebounced(string value)
+    {
+        _searchTerm = value;
+        await LoadContractorsAsync(_searchTerm);
+    }
+
+    private async Task LoadContractorsAsync(string? searchTerm)
+    {
+        _loading = true;
+
+        var contractors = await ContractorService.GetAllAsync(searchTerm);
+        var rowTasks = contractors.Select(async contractor =>
+        {
+            var linkedCount = await ContractorService.GetLinkedImprovementCountAsync(contractor.Id);
+            return new ContractorListRow(contractor, linkedCount);
+        });
+
+        _rows = [.. await Task.WhenAll(rowTasks)];
+        _loading = false;
+    }
+
+    private void ViewContractor(Guid contractorId)
+    {
+        Navigation.NavigateTo($"/contractors/{contractorId}");
+    }
+
+    private void EditContractor(Guid contractorId)
+    {
+        Navigation.NavigateTo($"/contractors/{contractorId}/edit");
+    }
+
+    private async Task DeleteContractorAsync(ContractorListRow row)
+    {
+        var linkedCount = await ContractorService.GetLinkedImprovementCountAsync(row.Contractor.Id);
+        if (linkedCount > 0)
+        {
+            Snackbar.Add($"Linked to {linkedCount} improvement record(s) - cannot delete", Severity.Warning);
+            return;
+        }
+
+        _pendingDeleteRow = row;
+        _deleteMessage = $"Delete '{row.Contractor.Name}'? This cannot be undone.";
+        _deleteDialogVisible = true;
+    }
+
+    private void CancelDelete()
+    {
+        _deleteDialogVisible = false;
+        _pendingDeleteRow = null;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_pendingDeleteRow is null)
+            return;
+
+        var deleted = await ContractorService.DeleteAsync(_pendingDeleteRow.Contractor.Id);
+        _deleteDialogVisible = false;
+        if (!deleted)
+        {
+            _pendingDeleteRow = null;
+            Snackbar.Add("Unable to delete contractor.", Severity.Error);
+            return;
+        }
+
+        await LoadContractorsAsync(_searchTerm);
+        _pendingDeleteRow = null;
+        Snackbar.Add("Contractor deleted", Severity.Success);
+    }
+
+    private sealed record ContractorListRow(Contractor Contractor, int LinkedImprovementCount);
+}
