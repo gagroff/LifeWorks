@@ -1,0 +1,186 @@
+@page "/improvements"
+@inject IHomeImprovementService HomeImprovementService
+@inject IPropertyService PropertyService
+@inject ICategoryService CategoryService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>Home Improvements</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Home Improvements</MudText>
+
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudSelect T="Guid?" Label="Property" Value="_filter.PropertyId" ValueChanged="v => { _filter.PropertyId = v; }" Clearable="true">
+                @foreach (var p in _properties)
+                {
+                    <MudSelectItem T="Guid?" Value="p.Id">@p.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudSelect T="Guid?" Label="Category" Value="_filter.CategoryId" ValueChanged="v => { _filter.CategoryId = v; }" Clearable="true">
+                @foreach (var c in _categories)
+                {
+                    <MudSelectItem T="Guid?" Value="c.Id">@c.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="2">
+            <MudDatePicker Label="Date From"
+                           Date="_dateFrom"
+                           DateChanged="d => _dateFrom = d"
+                           DateFormat="MM/dd/yyyy" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="2">
+            <MudDatePicker Label="Date To"
+                           Date="_dateTo"
+                           DateChanged="d => _dateTo = d"
+                           DateFormat="MM/dd/yyyy" />
+        </MudItem>
+        <MudItem xs="12" sm="12" md="2" Class="d-flex align-end gap-2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplyFiltersAsync">Apply</MudButton>
+            <MudButton Variant="Variant.Outlined" OnClick="ClearFiltersAsync">Clear</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Class="mb-2">
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Href="/improvements/new">
+        New Improvement
+    </MudButton>
+</MudStack>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_improvements.Count == 0)
+{
+    <MudText>No improvements found.</MudText>
+}
+else
+{
+
+    <MudDataGrid Items="_improvements" SortMode="SortMode.Single" Hover="true" Striped="true">
+        <Columns>
+            <PropertyColumn Property="x => x.DateCompleted" Title="Date" Format="MM/dd/yyyy" InitialDirection="SortDirection.Descending" />
+            <PropertyColumn Property="x => x.Title" Title="Title" />
+            <TemplateColumn Title="Property">
+                <CellTemplate>
+                    @context.Item.Property?.Name
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Category">
+                <CellTemplate>
+                    @context.Item.Category?.Name
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Contractor">
+                <CellTemplate>
+                    @(context.Item.Contractor is not null ? context.Item.Contractor.Name : "DIY")
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Cost">
+                <CellTemplate>
+                    @(context.Item.Cost.HasValue ? context.Item.Cost.Value.ToString("C") : string.Empty)
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Actions" Sortable="false">
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                   Color="Color.Primary"
+                                   OnClick="() => ViewImprovement(context.Item.Id)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Color="Color.Secondary"
+                                   OnClick="() => EditImprovement(context.Item.Id)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   OnClick="() => DeleteImprovementAsync(context.Item)" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+
+}
+
+@if (!_loading)
+{
+    <MudPaper Class="pa-3 mt-2" Elevation="0">
+        <MudText Typo="Typo.subtitle1">
+            <strong>Total Cost: @_totalCost.ToString("C")</strong>
+        </MudText>
+    </MudPaper>
+}
+
+
+@code {
+    private List<HomeImprovement> _improvements = [];
+    private List<Property> _properties = [];
+    private List<Category> _categories = [];
+    private HomeImprovementFilter _filter = new();
+    private DateTime? _dateFrom;
+    private DateTime? _dateTo;
+    private decimal _totalCost;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _properties = await PropertyService.GetAllAsync();
+        _categories = await CategoryService.GetAllAsync();
+
+        await LoadImprovementsAsync();
+    }
+
+    private async Task ApplyFiltersAsync()
+    {
+        _filter.DateFrom = _dateFrom.HasValue ? DateOnly.FromDateTime(_dateFrom.Value) : null;
+        _filter.DateTo = _dateTo.HasValue ? DateOnly.FromDateTime(_dateTo.Value) : null;
+        await LoadImprovementsAsync();
+    }
+
+    private async Task ClearFiltersAsync()
+    {
+        _filter = new();
+        _dateFrom = null;
+        _dateTo = null;
+        await LoadImprovementsAsync();
+    }
+
+    private async Task LoadImprovementsAsync()
+    {
+        _loading = true;
+        _improvements = await HomeImprovementService.GetAllAsync(_filter);
+        _totalCost = await HomeImprovementService.GetTotalCostAsync(_filter);
+        _loading = false;
+    }
+
+    private void ViewImprovement(Guid id) => Navigation.NavigateTo($"/improvements/{id}");
+    private void EditImprovement(Guid id) => Navigation.NavigateTo($"/improvements/{id}/edit");
+
+    private async Task DeleteImprovementAsync(HomeImprovement improvement)
+    {
+        var parameters = new DialogParameters<MudMessageBox>
+        {
+            { x => x.Message, $"Delete '{improvement.Title}'? This cannot be undone." },
+            { x => x.YesText, "Delete" },
+            { x => x.CancelText, "Cancel" }
+        };
+        var opts = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = await DialogService.ShowAsync<MudMessageBox>("Delete Improvement", parameters, opts);
+        var result = await dialog.Result;
+
+        if (result is null || result.Canceled)
+            return;
+
+        await HomeImprovementService.DeleteAsync(improvement.Id);
+        _improvements.Remove(improvement);
+        _totalCost = await HomeImprovementService.GetTotalCostAsync(_filter);
+        Snackbar.Add("Improvement deleted", Severity.Success);
+    }
+}

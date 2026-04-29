@@ -1,0 +1,180 @@
+@page "/improvements/{Id:guid}"
+@inject IHomeImprovementService HomeImprovementService
+@inject NavigationManager Navigation
+
+<PageTitle>Improvement Details</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Improvement Details</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_improvement is null)
+{
+    <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-4">
+        Improvement not found.
+    </MudAlert>
+    <MudButton Variant="Variant.Text" OnClick="BackToList">Back to List</MudButton>
+}
+else
+{
+    <MudCard Class="mb-4">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" Class="mb-3">@_improvement.Title</MudText>
+
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudText Class="mb-1"><strong>Date Completed:</strong> @_improvement.DateCompleted.ToString("MM/dd/yyyy")</MudText>
+                    <MudText Class="mb-1"><strong>Property:</strong> @(_improvement.Property?.Name ?? "-")</MudText>
+                    <MudText Class="mb-1"><strong>Category:</strong> @(_improvement.Category?.Name ?? "-")</MudText>
+                    <MudText Class="mb-1"><strong>Cost:</strong> @(_improvement.Cost.HasValue ? _improvement.Cost.Value.ToString("C") : "-")</MudText>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudText Class="mb-1"><strong>Warranty Expiration:</strong></MudText>
+                    @if (_improvement.WarrantyExpiration.HasValue)
+                    {
+                        <MudChip T="string" Color="@WarrantyColor(_improvement.WarrantyExpiration.Value)" Size="Size.Small" Class="mb-2">
+                            @WarrantyLabel(_improvement.WarrantyExpiration.Value)
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudText Class="mb-1">-</MudText>
+                    }
+                </MudItem>
+
+                @if (!string.IsNullOrWhiteSpace(_improvement.DetailedNotes))
+                {
+                    <MudItem xs="12">
+                        <MudText Class="mb-1"><strong>Notes:</strong></MudText>
+                        <MudText Style="white-space: pre-wrap">@_improvement.DetailedNotes</MudText>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+
+    @if (_improvement.Contractor is not null)
+    {
+        <MudCard Class="mb-4">
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Class="mb-2">Contractor</MudText>
+                <MudText Class="mb-1"><strong>Name:</strong> @_improvement.Contractor.Name</MudText>
+                @if (!string.IsNullOrWhiteSpace(_improvement.Contractor.CompanyName))
+                {
+                    <MudText Class="mb-1"><strong>Company:</strong> @_improvement.Contractor.CompanyName</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(_improvement.Contractor.Phone))
+                {
+                    <MudText Class="mb-1"><strong>Phone:</strong> @_improvement.Contractor.Phone</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(_improvement.Contractor.Email))
+                {
+                    <MudText Class="mb-1">
+                        <strong>Email:</strong>
+                        <MudLink Href="@($"mailto:{_improvement.Contractor.Email}")">@_improvement.Contractor.Email</MudLink>
+                    </MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(_improvement.Contractor.Website))
+                {
+                    <MudText Class="mb-1">
+                        <strong>Website:</strong>
+                        <MudLink Href="@_improvement.Contractor.Website" Target="_blank">@_improvement.Contractor.Website</MudLink>
+                    </MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    }
+    else
+    {
+        <MudCard Class="mb-4">
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Class="mb-1">Contractor</MudText>
+                <MudText>DIY (no contractor)</MudText>
+            </MudCardContent>
+        </MudCard>
+    }
+
+    @if (HasManufacturerInfo())
+    {
+        <MudCard Class="mb-4">
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Class="mb-2">Manufacturer Info</MudText>
+                @if (!string.IsNullOrWhiteSpace(_improvement.ManufacturerName))
+                {
+                    <MudText Class="mb-1"><strong>Manufacturer:</strong> @_improvement.ManufacturerName</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(_improvement.ManufacturerModel))
+                {
+                    <MudText Class="mb-1"><strong>Model:</strong> @_improvement.ManufacturerModel</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(_improvement.ManufacturerSerialNumber))
+                {
+                    <MudText Class="mb-1"><strong>Serial Number:</strong> @_improvement.ManufacturerSerialNumber</MudText>
+                }
+                @if (_improvement.ManufacturerWarrantyExpiration.HasValue)
+                {
+                    <MudText Class="mb-1"><strong>Manufacturer Warranty:</strong></MudText>
+                    <MudChip T="string" Color="@WarrantyColor(_improvement.ManufacturerWarrantyExpiration.Value)" Size="Size.Small">
+                        @WarrantyLabel(_improvement.ManufacturerWarrantyExpiration.Value)
+                    </MudChip>
+                }
+            </MudCardContent>
+        </MudCard>
+    }
+
+    <MudStack Row="true" Spacing="2">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="EditImprovement">Edit</MudButton>
+        <MudButton Variant="Variant.Text" OnClick="BackToList">Back to List</MudButton>
+    </MudStack>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private HomeImprovement? _improvement;
+    private bool _loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _improvement = await HomeImprovementService.GetByIdAsync(Id);
+        _loading = false;
+    }
+
+    private void EditImprovement() => Navigation.NavigateTo($"/improvements/{Id}/edit");
+    private void BackToList() => Navigation.NavigateTo("/improvements");
+
+    private bool HasManufacturerInfo() =>
+        _improvement is not null &&
+        (!string.IsNullOrWhiteSpace(_improvement.ManufacturerName) ||
+         !string.IsNullOrWhiteSpace(_improvement.ManufacturerModel) ||
+         !string.IsNullOrWhiteSpace(_improvement.ManufacturerSerialNumber) ||
+         _improvement.ManufacturerWarrantyExpiration.HasValue);
+
+    private static Color WarrantyColor(DateOnly expiration)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var daysRemaining = expiration.DayNumber - today.DayNumber;
+        return daysRemaining switch
+        {
+            > 90 => Color.Success,
+            >= 1 => Color.Warning,
+            _ => Color.Error
+        };
+    }
+
+    private static string WarrantyLabel(DateOnly expiration)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var daysRemaining = expiration.DayNumber - today.DayNumber;
+        return daysRemaining switch
+        {
+            > 0 => $"Expires {expiration:MM/dd/yyyy} ({daysRemaining}d remaining)",
+            0 => $"Expires today ({expiration:MM/dd/yyyy})",
+            _ => $"Expired {expiration:MM/dd/yyyy} ({-daysRemaining}d ago)"
+        };
+    }
+}

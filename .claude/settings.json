@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "c:\\code\\LifeWorks\\src\\LifeWorks.Web\\Components\\Pages"
+    ]
+  }
+}
