@@ -1,0 +1,105 @@
+@page "/settings/properties/new"
+@page "/settings/properties/{Id:guid}/edit"
+@inject IPropertyService PropertyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>@(_isEditMode ? "Edit Property" : "New Property")</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">@(_isEditMode ? "Edit Property" : "New Property")</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Name"
+                              Label="Name"
+                              Required="true"
+                              For="() => _model.Name"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Address"
+                              Label="Address"
+                              For="() => _model.Address"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_model.Notes"
+                              Label="Notes"
+                              Lines="3"
+                              For="() => _model.Notes"
+                              Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Row="true" Spacing="2" Class="mt-2">
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Save
+            </MudButton>
+            <MudButton Variant="Variant.Text" OnClick="BackToList">Cancel</MudButton>
+        </MudStack>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private Property _model = new();
+    private bool _loading = true;
+    private bool _isEditMode;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _isEditMode = Id.HasValue;
+
+        if (_isEditMode)
+        {
+            var existing = await PropertyService.GetByIdAsync(Id!.Value);
+            if (existing is null)
+            {
+                Snackbar.Add("Property not found.", Severity.Error);
+                Navigation.NavigateTo("/settings/properties");
+                return;
+            }
+            _model = existing;
+        }
+        else
+        {
+            _model = new Property();
+        }
+
+        _loading = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_isEditMode)
+        {
+            await PropertyService.UpdateAsync(_model);
+            Snackbar.Add("Property updated", Severity.Success);
+        }
+        else
+        {
+            await PropertyService.AddAsync(_model);
+            Snackbar.Add("Property added", Severity.Success);
+        }
+
+        Navigation.NavigateTo("/settings/properties");
+    }
+
+    private void BackToList() => Navigation.NavigateTo("/settings/properties");
+}

@@ -1,0 +1,96 @@
+@page "/settings/properties"
+@inject IPropertyService PropertyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>Properties</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Properties</MudText>
+
+<MudButton Variant="Variant.Filled"
+           Color="Color.Primary"
+           StartIcon="@Icons.Material.Filled.Add"
+           Href="/settings/properties/new"
+           Class="mb-4">
+    Add Property
+</MudButton>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_properties.Count == 0)
+{
+    <MudText>No properties found.</MudText>
+}
+else
+{
+    <MudTable Items="_properties" Hover="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Address</MudTh>
+            <MudTh>Notes</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Address</MudTd>
+            <MudTd>@context.Notes</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               Color="Color.Secondary"
+                               OnClick="() => EditProperty(context.Id)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                               Color="Color.Error"
+                               OnClick="() => DeletePropertyAsync(context)" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private List<Property> _properties = [];
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPropertiesAsync();
+    }
+
+    private void EditProperty(Guid id) => Navigation.NavigateTo($"/settings/properties/{id}/edit");
+
+    private async Task LoadPropertiesAsync()
+    {
+        _loading = true;
+        _properties = await PropertyService.GetAllAsync();
+        _loading = false;
+    }
+
+    private async Task DeletePropertyAsync(Property property)
+    {
+        var parameters = new DialogParameters<MudMessageBox>
+        {
+            { x => x.Message, $"Delete '{property.Name}'? This cannot be undone." },
+            { x => x.YesText, "Delete" },
+            { x => x.CancelText, "Cancel" }
+        };
+        var opts = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = await DialogService.ShowAsync<MudMessageBox>("Delete Property", parameters, opts);
+        var result = await dialog.Result;
+
+        if (result is null || result.Canceled)
+            return;
+
+        var success = await PropertyService.DeleteAsync(property.Id);
+        if (success)
+        {
+            _properties.Remove(property);
+            Snackbar.Add("Property deleted", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Cannot delete this property — it has linked improvements.", Severity.Error);
+        }
+    }
+}
