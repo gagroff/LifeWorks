@@ -1,7 +1,47 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>LifeWorks</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudText Typo="Typo.h4" GutterBottom="true">Welcome to LifeWorks</MudText>
+<MudText Typo="Typo.body1" Class="mb-6">Track home improvements, contractors, and property history in one place.</MudText>
 
-Welcome to your new app.
+<MudGrid>
+    <MudItem xs="12" sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudIcon Icon="@Icons.Material.Filled.Build" Color="Color.Primary" Size="Size.Large" Class="mb-2" />
+                <MudText Typo="Typo.h6">Home Improvements</MudText>
+                <MudText Typo="Typo.body2">Log and track repairs, upgrades, and projects across your properties.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="/improvements" Variant="Variant.Filled" Color="Color.Primary">View Improvements</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Secondary" Size="Size.Large" Class="mb-2" />
+                <MudText Typo="Typo.h6">Contractors</MudText>
+                <MudText Typo="Typo.body2">Manage your trusted contractors and their contact information.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="/contractors" Variant="Variant.Filled" Color="Color.Secondary">View Contractors</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Tertiary" Size="Size.Large" Class="mb-2" />
+                <MudText Typo="Typo.h6">Categories</MudText>
+                <MudText Typo="Typo.body2">Customize the categories used to organize your improvements.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Href="/settings/categories" Variant="Variant.Filled" Color="Color.Tertiary">Manage Categories</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
