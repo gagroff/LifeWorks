@@ -85,4 +85,79 @@ public class HomeImprovementServiceTests
         await _repo.Received(1).AddAsync(improvement);
         await _repo.Received(1).SaveChangesAsync();
     }
+
+    [Fact]
+    public async Task GetCostByProperty_DelegatesToRepository()
+    {
+        var expected = new List<(string, decimal)> { ("Primary Home", 4500m), ("Lake House", 1200m) };
+        _repo.GetCostByPropertyAsync().Returns(expected);
+
+        var result = await _sut.GetCostByPropertyAsync();
+
+        Assert.Equal(expected, result);
+        await _repo.Received(1).GetCostByPropertyAsync();
+    }
+
+    [Fact]
+    public async Task GetCostByCategory_DelegatesToRepository()
+    {
+        var expected = new List<(string, decimal)> { ("Roofing", 3000m), ("Plumbing", 800m) };
+        _repo.GetCostByCategoryAsync().Returns(expected);
+
+        var result = await _sut.GetCostByCategoryAsync();
+
+        Assert.Equal(expected, result);
+        await _repo.Received(1).GetCostByCategoryAsync();
+    }
+
+    [Fact]
+    public async Task GetExpiringWarranties_DelegatesToRepositoryWithDays()
+    {
+        var expected = new List<HomeImprovement>
+        {
+            new() { Title = "HVAC unit", WarrantyExpiration = DateOnly.FromDateTime(DateTime.Today.AddDays(30)) }
+        };
+        _repo.GetExpiringWarrantiesAsync(90).Returns(expected);
+
+        var result = await _sut.GetExpiringWarrantiesAsync(90);
+
+        Assert.Equal(expected, result);
+        await _repo.Received(1).GetExpiringWarrantiesAsync(90);
+    }
+
+    [Fact]
+    public async Task GetExpiringWarranties_ReturnsEmptyList_WhenNoneExpiring()
+    {
+        _repo.GetExpiringWarrantiesAsync(Arg.Any<int>()).Returns([]);
+
+        var result = await _sut.GetExpiringWarrantiesAsync(90);
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetRecent_DelegatesToRepositoryWithCount()
+    {
+        var expected = new List<HomeImprovement>
+        {
+            new() { Title = "Paint bedroom", DateCompleted = new DateOnly(2025, 4, 1) },
+            new() { Title = "Fix fence",     DateCompleted = new DateOnly(2025, 3, 15) }
+        };
+        _repo.GetRecentAsync(5).Returns(expected);
+
+        var result = await _sut.GetRecentAsync(5);
+
+        Assert.Equal(expected, result);
+        await _repo.Received(1).GetRecentAsync(5);
+    }
+
+    [Fact]
+    public async Task GetRecent_ReturnsEmptyList_WhenNoImprovementsExist()
+    {
+        _repo.GetRecentAsync(Arg.Any<int>()).Returns([]);
+
+        var result = await _sut.GetRecentAsync(5);
+
+        Assert.Empty(result);
+    }
 }

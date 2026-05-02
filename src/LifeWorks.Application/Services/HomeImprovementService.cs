@@ -40,4 +40,16 @@ public class HomeImprovementService(IHomeImprovementRepository repository) : IHo
 
     public Task<decimal> GetTotalCostAsync(HomeImprovementFilter? filter = null) =>
         repository.GetTotalCostAsync(filter ?? new HomeImprovementFilter());
+
+    public Task<List<(string PropertyName, decimal TotalCost)>> GetCostByPropertyAsync() =>
+        repository.GetCostByPropertyAsync();
+
+    public Task<List<(string CategoryName, decimal TotalCost)>> GetCostByCategoryAsync() =>
+        repository.GetCostByCategoryAsync();
+
+    public Task<List<HomeImprovement>> GetExpiringWarrantiesAsync(int withinDays) =>
+        repository.GetExpiringWarrantiesAsync(withinDays);
+
+    public Task<List<HomeImprovement>> GetRecentAsync(int count) =>
+        repository.GetRecentAsync(count);
 }
