@@ -230,22 +230,22 @@
 
 ### 5.1 — Home Improvements List Page
 
-- [ ] Create `src/LifeWorks.Web/Components/Pages/Improvements/Index.razor` (`@page "/improvements"`)
-- [ ] Inject `IHomeImprovementService`, `IPropertyService`, `ICategoryService`
-- [ ] Filter bar (`MudExpansionPanel` or always-visible):
+- [x] Create `src/LifeWorks.Web/Components/Pages/Improvements/Index.razor` (`@page "/improvements"`)
+- [x] Inject `IHomeImprovementService`, `IPropertyService`, `ICategoryService`
+- [x] Filter bar (`MudExpansionPanel` or always-visible):
   - `MudSelect<Guid?>` — Property
   - `MudSelect<Guid?>` — Category
   - Two `MudDatePicker` fields — Date range
   - **Apply** and **Clear** buttons
-- [ ] `MudDataGrid<HomeImprovement>` columns: **Date** (default sort desc), **Title**, **Property**, **Category**, **Contractor** ("DIY" if null), **Cost** (currency format, blank if null), **Actions** (View / Edit / Delete)
-- [ ] Running total below grid: `GetTotalCostAsync(currentFilter)` formatted as currency
-- [ ] Empty-state message and loading spinner
+- [x] `MudDataGrid<HomeImprovement>` columns: **Date** (default sort desc), **Title**, **Property**, **Category**, **Contractor** ("DIY" if null), **Cost** (currency format, blank if null), **Actions** (View / Edit / Delete)
+- [x] Running total below grid: `GetTotalCostAsync(currentFilter)` formatted as currency
+- [x] Empty-state message and loading spinner
 
 ### 5.2 — Create / Edit Form
 
-- [ ] Create `src/LifeWorks.Web/Components/Pages/Improvements/ImprovementForm.razor` (`@page "/improvements/new"`, `@page "/improvements/{Id:guid}/edit"`)
-- [ ] Inject `IHomeImprovementService`, `IPropertyService`, `ICategoryService`, `IContractorService`, `NavigationManager`, `ISnackbar`
-- [ ] Fields (use `MudGrid`/`MudItem` for layout):
+- [x] Create `src/LifeWorks.Web/Components/Pages/Improvements/ImprovementForm.razor` (`@page "/improvements/new"`, `@page "/improvements/{Id:guid}/edit"`)
+- [x] Inject `IHomeImprovementService`, `IPropertyService`, `ICategoryService`, `IContractorService`, `NavigationManager`, `ISnackbar`
+- [x] Fields (use `MudGrid`/`MudItem` for layout):
   - **Title** — required, `[Required][MaxLength(300)]`
   - **Property** — `MudSelect<Guid>`, required
   - **Category** — `MudSelect<Guid>`, required
@@ -255,28 +255,28 @@
   - **Warranty Expiration** — `MudDatePicker`, optional
   - **Detailed Notes** — `MudTextField` multiline, optional
   - **Manufacturer Info** — `MudExpansionPanel` (collapsed by default): Manufacturer Name, Model, Serial Number, Manufacturer Warranty Expiration
-- [ ] Submit: `AddAsync` or `UpdateAsync`, navigate to `/improvements` with snackbar
-- [ ] `EditForm` with `DataAnnotationsValidator`
+- [x] Submit: `AddAsync` or `UpdateAsync`, navigate to `/improvements` with snackbar
+- [x] `EditForm` with `DataAnnotationsValidator`
 
 ### 5.3 — Detail View
 
-- [ ] Create `src/LifeWorks.Web/Components/Pages/Improvements/ImprovementDetail.razor` (`@page "/improvements/{Id:guid}"`)
-- [ ] `MudCard` read-only display of all fields
-- [ ] Contractor section: if not null, show Name, Company, Phone, Email, Website (`MudLink` for email/website)
-- [ ] Warranty chips: compute days remaining for `WarrantyExpiration` and `ManufacturerWarrantyExpiration`:
+- [x] Create `src/LifeWorks.Web/Components/Pages/Improvements/ImprovementDetail.razor` (`@page "/improvements/{Id:guid}"`)
+- [x] `MudCard` read-only display of all fields
+- [x] Contractor section: if not null, show Name, Company, Phone, Email, Website (`MudLink` for email/website)
+- [x] Warranty chips: compute days remaining for `WarrantyExpiration` and `ManufacturerWarrantyExpiration`:
   - Green: > 90 days remaining
   - Yellow: 1–90 days remaining
   - Red: expired
-- [ ] **Edit** and **Back to List** buttons
+- [x] **Edit** and **Back to List** buttons
 
 ### 5.4 — Delete
 
-- [ ] Delete button on list page: `MudMessageBox` confirmation "Delete '{title}'? This cannot be undone."
-- [ ] On confirm: `DeleteAsync`, remove from local list, recalculate running total, show snackbar
+- [x] Delete button on list page: `MudMessageBox` confirmation "Delete '{title}'? This cannot be undone."
+- [x] On confirm: `DeleteAsync`, remove from local list, recalculate running total, show snackbar
 
 ### 5.5 — Navigation Wiring
 
-- [ ] Verify `src/LifeWorks.Web/Components/Layout/NavMenu.razor` Href values match routes exactly: `"improvements"`, `"contractors"`, `"settings/categories"`
+- [x] Verify `src/LifeWorks.Web/Components/Layout/NavMenu.razor` Href values match routes exactly: `"improvements"`, `"contractors"`, `"settings/categories"`
 
 ### Phase 5 Verification
 
@@ -287,7 +287,7 @@
 - [ ] Detail view: contractor contact info shown; warranty chips display correct color
 - [ ] Edit: form pre-populates; changes save and reflect in list
 - [ ] Delete: confirmation dialog; record removed; total updates
-- [ ] `dotnet build` — zero errors
+- [x] `dotnet build` — zero errors
 - [ ] Commit on branch `feature/phase-5-improvements`, PR passes CI, merge
 
 ---

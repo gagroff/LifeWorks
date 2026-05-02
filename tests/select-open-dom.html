@@ -1,0 +1,328 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="/">
+    
+    <link rel="stylesheet" href="app.khy4lop6wu.css">
+    <link rel="stylesheet" href="LifeWorks.Web.65mdo1jllp.styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap" rel="stylesheet">
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet">
+    <script type="importmap">{
+  "imports": {
+    "./_content/MudBlazor/MudBlazor.min.js": "./_content/MudBlazor/MudBlazor.min.cf158k2j5i.js",
+    "./_framework/blazor.server.js": "./_framework/blazor.server.iz83ucvm53.js",
+    "./_framework/blazor.web.js": "./_framework/blazor.web.2i0r6wwb69.js",
+    "./lib/bootstrap/dist/js/bootstrap.bundle.js": "./lib/bootstrap/dist/js/bootstrap.bundle.6cfz1n2cew.js",
+    "./lib/bootstrap/dist/js/bootstrap.bundle.min.js": "./lib/bootstrap/dist/js/bootstrap.bundle.min.493y06b0oq.js",
+    "./lib/bootstrap/dist/js/bootstrap.esm.min.js": "./lib/bootstrap/dist/js/bootstrap.esm.min.jj8uyg4cgr.js",
+    "./lib/bootstrap/dist/js/bootstrap.esm.js": "./lib/bootstrap/dist/js/bootstrap.esm.vr1egmr9el.js",
+    "./lib/bootstrap/dist/js/bootstrap.min.js": "./lib/bootstrap/dist/js/bootstrap.min.63fj8s7r0e.js",
+    "./lib/bootstrap/dist/js/bootstrap.js": "./lib/bootstrap/dist/js/bootstrap.notf2xhcfb.js"
+  }
+}</script>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>New Improvement</title></head>
+
+<body><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><style>
+::-webkit-scrollbar {width: 8px;height: 8px;z-index: 1;}
+::-webkit-scrollbar-track {background: transparent;}
+::-webkit-scrollbar-thumb {background: #c4c4c4;border-radius: 1px;}
+::-webkit-scrollbar-thumb:hover {background: #a6a6a6;}
+html, body * {scrollbar-color: #c4c4c4 transparent;scrollbar-width: thin;}
+</style>
+<!--!--><style>
+    .mud-chart-serie:hover {
+        filter: url(#lighten);
+    }
+
+    .mud-chart-serie-hovered 
+    {
+        filter: url(#lighten);
+    }
+</style>
+
+<!--!--><style class="mud-theme-provider">
+:root{
+--mud-palette-black: rgba(39,44,52,1);
+--mud-palette-white: rgba(255,255,255,1);
+--mud-palette-primary: rgba(89,74,226,1);
+--mud-palette-primary-rgb: 89,74,226;
+--mud-palette-primary-text: rgba(255,255,255,1);
+--mud-palette-primary-darken: rgb(62,44,221);
+--mud-palette-primary-lighten: rgb(118,106,231);
+--mud-palette-primary-hover: rgba(89,74,226,0.058823529411764705);
+--mud-palette-secondary: rgba(255,64,129,1);
+--mud-palette-secondary-rgb: 255,64,129;
+--mud-palette-secondary-text: rgba(255,255,255,1);
+--mud-palette-secondary-darken: rgb(255,31,105);
+--mud-palette-secondary-lighten: rgb(255,102,153);
+--mud-palette-secondary-hover: rgba(255,64,129,0.058823529411764705);
+--mud-palette-tertiary: rgba(30,200,165,1);
+--mud-palette-tertiary-rgb: 30,200,165;
+--mud-palette-tertiary-text: rgba(255,255,255,1);
+--mud-palette-tertiary-darken: rgb(25,169,140);
+--mud-palette-tertiary-lighten: rgb(42,223,187);
+--mud-palette-tertiary-hover: rgba(30,200,165,0.058823529411764705);
+--mud-palette-info: rgba(33,150,243,1);
+--mud-palette-info-rgb: 33,150,243;
+--mud-palette-info-text: rgba(255,255,255,1);
+--mud-palette-info-darken: rgb(12,128,223);
+--mud-palette-info-lighten: rgb(71,167,245);
+--mud-palette-info-hover: rgba(33,150,243,0.058823529411764705);
+--mud-palette-success: rgba(0,200,83,1);
+--mud-palette-success-rgb: 0,200,83;
+--mud-palette-success-text: rgba(255,255,255,1);
+--mud-palette-success-darken: rgb(0,163,68);
+--mud-palette-success-lighten: rgb(0,235,98);
+--mud-palette-success-hover: rgba(0,200,83,0.058823529411764705);
+--mud-palette-warning: rgba(255,152,0,1);
+--mud-palette-warning-rgb: 255,152,0;
+--mud-palette-warning-text: rgba(255,255,255,1);
+--mud-palette-warning-darken: rgb(214,129,0);
+--mud-palette-warning-lighten: rgb(255,167,36);
+--mud-palette-warning-hover: rgba(255,152,0,0.058823529411764705);
+--mud-palette-error: rgba(244,67,54,1);
+--mud-palette-error-rgb: 244,67,54;
+--mud-palette-error-text: rgba(255,255,255,1);
+--mud-palette-error-darken: rgb(242,28,13);
+--mud-palette-error-lighten: rgb(246,96,85);
+--mud-palette-error-hover: rgba(244,67,54,0.058823529411764705);
+--mud-palette-dark: rgba(66,66,66,1);
+--mud-palette-dark-rgb: 66,66,66;
+--mud-palette-dark-text: rgba(255,255,255,1);
+--mud-palette-dark-darken: rgb(46,46,46);
+--mud-palette-dark-lighten: rgb(87,87,87);
+--mud-palette-dark-hover: rgba(66,66,66,0.058823529411764705);
+--mud-palette-text-primary: rgba(66,66,66,1);
+--mud-palette-text-primary-rgb: 66,66,66;
+--mud-palette-text-secondary: rgba(0,0,0,0.5372549019607843);
+--mud-palette-text-secondary-rgb: 0,0,0;
+--mud-palette-text-disabled: rgba(0,0,0,0.3764705882352941);
+--mud-palette-text-disabled-rgb: 0,0,0;
+--mud-palette-action-default: rgba(0,0,0,0.5372549019607843);
+--mud-palette-action-default-hover: rgba(0,0,0,0.058823529411764705);
+--mud-palette-action-disabled: rgba(0,0,0,0.25882352941176473);
+--mud-palette-action-disabled-background: rgba(0,0,0,0.11764705882352941);
+--mud-palette-surface: rgba(255,255,255,1);
+--mud-palette-surface-rgb: 255,255,255;
+--mud-palette-background: rgba(255,255,255,1);
+--mud-palette-background-gray: rgba(245,245,245,1);
+--mud-palette-drawer-background: rgba(255,255,255,1);
+--mud-palette-drawer-text: rgba(66,66,66,1);
+--mud-palette-drawer-icon: rgba(97,97,97,1);
+--mud-palette-appbar-background: rgba(89,74,226,1);
+--mud-palette-appbar-text: rgba(255,255,255,1);
+--mud-palette-lines-default: rgba(0,0,0,0.11764705882352941);
+--mud-palette-lines-inputs: rgba(189,189,189,1);
+--mud-palette-table-lines: rgba(224,224,224,1);
+--mud-palette-table-striped: rgba(0,0,0,0.0196078431372549);
+--mud-palette-table-hover: rgba(0,0,0,0.0392156862745098);
+--mud-palette-divider: rgba(224,224,224,1);
+--mud-palette-divider-rgb: 224,224,224;
+--mud-palette-divider-light: rgba(0,0,0,0.8);
+--mud-palette-skeleton: rgba(0,0,0,0.10980392156862745);
+--mud-palette-gray-default: #9E9E9E;
+--mud-palette-gray-light: #BDBDBD;
+--mud-palette-gray-lighter: #E0E0E0;
+--mud-palette-gray-dark: #757575;
+--mud-palette-gray-darker: #616161;
+--mud-palette-overlay-dark: rgba(33,33,33,0.4980392156862745);
+--mud-palette-overlay-light: rgba(255,255,255,0.4980392156862745);
+--mud-palette-border-opacity: 1;
+--mud-ripple-color: var(--mud-palette-text-primary);
+--mud-ripple-opacity: 0.1;
+--mud-ripple-opacity-secondary: 0.2;
+--mud-elevation-0: none;
+--mud-elevation-1: 0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12);
+--mud-elevation-2: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+--mud-elevation-3: 0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12);
+--mud-elevation-4: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);
+--mud-elevation-5: 0px 3px 5px -1px rgba(0,0,0,0.2),0px 5px 8px 0px rgba(0,0,0,0.14),0px 1px 14px 0px rgba(0,0,0,0.12);
+--mud-elevation-6: 0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);
+--mud-elevation-7: 0px 4px 5px -2px rgba(0,0,0,0.2),0px 7px 10px 1px rgba(0,0,0,0.14),0px 2px 16px 1px rgba(0,0,0,0.12);
+--mud-elevation-8: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
+--mud-elevation-9: 0px 5px 6px -3px rgba(0,0,0,0.2),0px 9px 12px 1px rgba(0,0,0,0.14),0px 3px 16px 2px rgba(0,0,0,0.12);
+--mud-elevation-10: 0px 6px 6px -3px rgba(0,0,0,0.2),0px 10px 14px 1px rgba(0,0,0,0.14),0px 4px 18px 3px rgba(0,0,0,0.12);
+--mud-elevation-11: 0px 6px 7px -4px rgba(0,0,0,0.2),0px 11px 15px 1px rgba(0,0,0,0.14),0px 4px 20px 3px rgba(0,0,0,0.12);
+--mud-elevation-12: 0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12);
+--mud-elevation-13: 0px 7px 8px -4px rgba(0,0,0,0.2),0px 13px 19px 2px rgba(0,0,0,0.14),0px 5px 24px 4px rgba(0,0,0,0.12);
+--mud-elevation-14: 0px 7px 9px -4px rgba(0,0,0,0.2),0px 14px 21px 2px rgba(0,0,0,0.14),0px 5px 26px 4px rgba(0,0,0,0.12);
+--mud-elevation-15: 0px 8px 9px -5px rgba(0,0,0,0.2),0px 15px 22px 2px rgba(0,0,0,0.14),0px 6px 28px 5px rgba(0,0,0,0.12);
+--mud-elevation-16: 0px 8px 10px -5px rgba(0,0,0,0.2),0px 16px 24px 2px rgba(0,0,0,0.14),0px 6px 30px 5px rgba(0,0,0,0.12);
+--mud-elevation-17: 0px 8px 11px -5px rgba(0,0,0,0.2),0px 17px 26px 2px rgba(0,0,0,0.14),0px 6px 32px 5px rgba(0,0,0,0.12);
+--mud-elevation-18: 0px 9px 11px -5px rgba(0,0,0,0.2),0px 18px 28px 2px rgba(0,0,0,0.14),0px 7px 34px 6px rgba(0,0,0,0.12);
+--mud-elevation-19: 0px 9px 12px -6px rgba(0,0,0,0.2),0px 19px 29px 2px rgba(0,0,0,0.14),0px 7px 36px 6px rgba(0,0,0,0.12);
+--mud-elevation-20: 0px 10px 13px -6px rgba(0,0,0,0.2),0px 20px 31px 3px rgba(0,0,0,0.14),0px 8px 38px 7px rgba(0,0,0,0.12);
+--mud-elevation-21: 0px 10px 13px -6px rgba(0,0,0,0.2),0px 21px 33px 3px rgba(0,0,0,0.14),0px 8px 40px 7px rgba(0,0,0,0.12);
+--mud-elevation-22: 0px 10px 14px -6px rgba(0,0,0,0.2),0px 22px 35px 3px rgba(0,0,0,0.14),0px 8px 42px 7px rgba(0,0,0,0.12);
+--mud-elevation-23: 0px 11px 14px -7px rgba(0,0,0,0.2),0px 23px 36px 3px rgba(0,0,0,0.14),0px 9px 44px 8px rgba(0,0,0,0.12);
+--mud-elevation-24: 0px 11px 15px -7px rgba(0,0,0,0.2),0px 24px 38px 3px rgba(0,0,0,0.14),0px 9px 46px 8px rgba(0,0,0,0.12);
+--mud-elevation-25: 0 5px 5px -3px rgba(0,0,0,.06), 0 8px 10px 1px rgba(0,0,0,.042), 0 3px 14px 2px rgba(0,0,0,.036);
+--mud-default-borderradius: 4px;
+--mud-drawer-width-left: 240px;
+--mud-drawer-width-right: 240px;
+--mud-drawer-width-mini-left: 56px;
+--mud-drawer-width-mini-right: 56px;
+--mud-appbar-height: 64px;
+--mud-typography-default-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-default-size: .875rem;
+--mud-typography-default-weight: 400;
+--mud-typography-default-lineheight: 1.43;
+--mud-typography-default-letterspacing: .01071em;
+--mud-typography-default-text-transform: none;
+--mud-typography-h1-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-h1-size: 6rem;
+--mud-typography-h1-weight: 300;
+--mud-typography-h1-lineheight: 1.167;
+--mud-typography-h1-letterspacing: -.01562em;
+--mud-typography-h1-text-transform: none;
+--mud-typography-h2-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-h2-size: 3.75rem;
+--mud-typography-h2-weight: 300;
+--mud-typography-h2-lineheight: 1.2;
+--mud-typography-h2-letterspacing: -.00833em;
+--mud-typography-h2-text-transform: none;
+--mud-typography-h3-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-h3-size: 3rem;
+--mud-typography-h3-weight: 400;
+--mud-typography-h3-lineheight: 1.167;
+--mud-typography-h3-letterspacing: 0;
+--mud-typography-h3-text-transform: none;
+--mud-typography-h4-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-h4-size: 2.125rem;
+--mud-typography-h4-weight: 400;
+--mud-typography-h4-lineheight: 1.235;
+--mud-typography-h4-letterspacing: .00735em;
+--mud-typography-h4-text-transform: none;
+--mud-typography-h5-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-h5-size: 1.5rem;
+--mud-typography-h5-weight: 400;
+--mud-typography-h5-lineheight: 1.334;
+--mud-typography-h5-letterspacing: 0;
+--mud-typography-h5-text-transform: none;
+--mud-typography-h6-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-h6-size: 1.25rem;
+--mud-typography-h6-weight: 500;
+--mud-typography-h6-lineheight: 1.6;
+--mud-typography-h6-letterspacing: .0075em;
+--mud-typography-h6-text-transform: none;
+--mud-typography-subtitle1-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-subtitle1-size: 1rem;
+--mud-typography-subtitle1-weight: 400;
+--mud-typography-subtitle1-lineheight: 1.75;
+--mud-typography-subtitle1-letterspacing: .00938em;
+--mud-typography-subtitle1-text-transform: none;
+--mud-typography-subtitle2-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-subtitle2-size: .875rem;
+--mud-typography-subtitle2-weight: 500;
+--mud-typography-subtitle2-lineheight: 1.57;
+--mud-typography-subtitle2-letterspacing: .00714em;
+--mud-typography-subtitle2-text-transform: none;
+--mud-typography-body1-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-body1-size: 1rem;
+--mud-typography-body1-weight: 400;
+--mud-typography-body1-lineheight: 1.5;
+--mud-typography-body1-letterspacing: .00938em;
+--mud-typography-body1-text-transform: none;
+--mud-typography-body2-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-body2-size: .875rem;
+--mud-typography-body2-weight: 400;
+--mud-typography-body2-lineheight: 1.43;
+--mud-typography-body2-letterspacing: .01071em;
+--mud-typography-body2-text-transform: none;
+--mud-typography-button-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-button-size: .875rem;
+--mud-typography-button-weight: 500;
+--mud-typography-button-lineheight: 1.75;
+--mud-typography-button-letterspacing: .02857em;
+--mud-typography-button-text-transform: uppercase;
+--mud-typography-caption-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-caption-size: .75rem;
+--mud-typography-caption-weight: 400;
+--mud-typography-caption-lineheight: 1.66;
+--mud-typography-caption-letterspacing: .03333em;
+--mud-typography-caption-text-transform: none;
+--mud-typography-overline-family: Roboto, Helvetica, Arial, sans-serif;
+--mud-typography-overline-size: .75rem;
+--mud-typography-overline-weight: 400;
+--mud-typography-overline-lineheight: 2.66;
+--mud-typography-overline-letterspacing: .08333em;
+--mud-typography-overline-text-transform: none;
+--mud-zindex-drawer: 1100;
+--mud-zindex-appbar: 1300;
+--mud-zindex-dialog: 1400;
+--mud-zindex-popover: 1200;
+--mud-zindex-snackbar: 1500;
+--mud-zindex-tooltip: 1600;
+--mud-native-html-color-scheme: light;
+}
+</style>
+<!--!-->
+<!--!--><div class="mud-popover-provider"><!--!--><!--!--><div data-modeless-ignore-element-id="select9z1je7ip" id="overlayhf0baozo" class="mud-overlay" style="pointer-events: none; z-index: 1201;"></div><!--!--><div id="popovercontent-f4a9718c-de9f-417b-8990-1d1ed9532d98" data-ticks="0" class="mud-popover mud-popover-fixed mud-popover-top-left mud-popover-anchor-bottom-left mud-popover-overflow-flip-always mud-picker-popover mud-elevation-8" style="transition-duration:251ms;transition-delay:0ms;"></div><!--!--><div id="popovercontent-c2ae71a6-461e-4f6e-9a3a-33ffba61af45" data-ticks="0" class="mud-popover mud-popover-fixed mud-popover-top-left mud-popover-anchor-bottom-left mud-popover-overflow-flip-always mud-picker-popover mud-elevation-8" style="transition-duration:251ms;transition-delay:0ms;"></div><!--!--><div id="popovercontent-1fc3b109-d757-4033-a1f1-373b27c68a4f" data-ticks="639129502099303076" class="mud-popover mud-popover-open mud-popover-top-left mud-popover-anchor-bottom-left mud-popover-overflow-flip-always mud-popover-relative-width mud-paper mud-elevation-8 overflow-y-auto" style="transition-duration: 251ms; transition-delay: 0ms; max-height: 300px; max-width: 492px; left: 256px; top: 269.984px; z-index: 1201;"><!--!--><!--!--><div class="mud-list"><!--!--><!--!--><!--!--><!--!--><div tabindex="0" id="l3675dtab" class="mud-list-item mud-list-item-gutters mud-list-item-clickable mud-ripple"><div class="mud-list-item-text"><!--!--><!--!--><p class="mud-typography mud-typography-body1">Primary Home</p></div></div><!--!--><!--!--><!--!--><div tabindex="0" id="sf8mlhwzs" class="mud-list-item mud-list-item-gutters mud-list-item-clickable mud-ripple"><div class="mud-list-item-text"><!--!--><!--!--><p class="mud-typography mud-typography-body1">Lake House</p></div></div></div></div><!--!--><div id="popovercontent-ebd5f8c8-c0e5-484f-950d-3d39cfb76dec" data-ticks="0" class="mud-popover mud-popover-top-left mud-popover-anchor-bottom-left mud-popover-overflow-flip-always mud-popover-relative-width mud-paper mud-elevation-8 overflow-y-auto" style="transition-duration:251ms;transition-delay:0ms;max-height:300px;"></div><!--!--><div id="popovercontent-dbc5acff-358e-49af-b27c-d3b60620bb89" data-ticks="0" class="mud-popover mud-popover-top-left mud-popover-anchor-bottom-left mud-popover-overflow-flip-always mud-popover-relative-width mud-paper mud-elevation-8 overflow-y-auto" style="transition-duration:251ms;transition-delay:0ms;max-height:300px;"></div><!--!--><div id="popovercontent-70fc95e6-eec8-47fe-90cc-3ad6d1b53b3f" data-ticks="0" class="mud-popover mud-popover-fixed mud-popover-top-left mud-popover-anchor-bottom-left mud-popover-overflow-flip-always mud-picker-popover mud-elevation-8" style="transition-duration:251ms;transition-delay:0ms;"></div></div><!--!-->
+<!--!--><!--!--><!--!--><!--!-->
+<!--!--><div id="mud-snackbar-container" class="mud-snackbar-location-top-right"></div><!--!-->
+
+<!--!--><div class="mud-layout mud-drawer-open-responsive-md-left mud-drawer-left-clipped-never" style=""><!--!--><!--!--><header class="mud-appbar mud-appbar-fixed-top mud-elevation-1"><!--!--><div role="toolbar" class="mud-toolbar mud-toolbar-gutters mud-toolbar-appbar"><!--!--><!--!--><button type="button" class="mud-button-root mud-icon-button mud-inherit-text hover:mud-inherit-hover mud-ripple mud-ripple-icon mud-icon-button-edge-start" _bl_2141689a-7ef3-4b04-81c5-0ba7fc692498=""><span class="mud-icon-button-label"><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></span></button><!--!-->
+        <!--!--><!--!--><h6 class="mud-typography mud-typography-h6 ml-2">LifeWorks</h6></div></header><!--!-->
+
+    <!--!--><aside class="mud-drawer mud-drawer-fixed mud-drawer-pos-left mud-drawer--open mud-drawer--initial mud-drawer-md mud-drawer-clipped-never mud-elevation-2 mud-drawer-responsive" style=""><div class="mud-drawer-content" _bl_f00d0c0b-4255-4fda-86bf-7dce41789b8e=""><!--!--><!--!--><div class="mud-drawer-header"><!--!--><!--!--><h6 class="mud-typography mud-typography-h6">LifeWorks</h6></div><!--!-->
+        <!--!--><!--!--><nav class="mud-navmenu mud-navmenu-default mud-navmenu-margin-none"><!--!--><!--!--><div class="mud-nav-item"><!--!--><a href="" rel="" tabindex="0" class="mud-nav-link mud-ripple"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-nav-link-icon mud-nav-link-icon-default" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path></svg><div class="mud-nav-link-text"><!--!-->
+        Home
+    </div></a></div><!--!-->
+
+    <!--!--><nav class="mud-nav-group" aria-label="Property Management"><button tabindex="0" class="mud-nav-link mud-ripple mud-expanded" aria-controls="yu188gn0o" aria-expanded="true" aria-label="Toggle Property Management"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-nav-link-icon mud-nav-link-icon-default" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><g><rect fill="none" height="24" width="24"></rect></g><g><g><polygon points="1,11 1,21 6,21 6,15 10,15 10,21 15,21 15,11 8,6"></polygon><path d="M10,3v1.97l7,5V11h2v2h-2v2h2v2h-2v4h6V3H10z M19,9h-2V7h2V9z"></path></g></g></svg><div class="mud-nav-link-text">Property Management</div><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium mud-nav-link-expand-icon mud-transform" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 10l5 5 5-5z"></path></svg></button><!--!-->
+    <!--!--><div aria-hidden="false" class="mud-collapse-container mud-collapse-entered mud-navgroup-collapse" style=""><div class="mud-collapse-wrapper"><div class="mud-collapse-wrapper-inner"><!--!--><!--!--><nav id="yu188gn0o" class="mud-navmenu mud-navmenu-default mud-navmenu-margin-none"><!--!--><!--!--><div class="mud-nav-item"><!--!--><a href="improvements" rel="" tabindex="0" class="mud-nav-link mud-ripple active" aria-current="page"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-nav-link-icon mud-nav-link-icon-default" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path clip-rule="evenodd" d="M0 0h24v24H0z" fill="none"></path><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"></path></svg><div class="mud-nav-link-text"><!--!-->
+            Home Improvements
+        </div></a></div><!--!-->
+        <!--!--><div class="mud-nav-item"><!--!--><a href="contractors" rel="" tabindex="0" class="mud-nav-link mud-ripple"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-nav-link-icon mud-nav-link-icon-default" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><g><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M9,15c-2.67,0-8,1.34-8,4v2h16v-2C17,16.34,11.67,15,9,15z"></path><path d="M22.1,6.84c0.01-0.11,0.02-0.22,0.02-0.34c0-0.12-0.01-0.23-0.03-0.34l0.74-0.58c0.07-0.05,0.08-0.15,0.04-0.22l-0.7-1.21 c-0.04-0.08-0.14-0.1-0.21-0.08L21.1,4.42c-0.18-0.14-0.38-0.25-0.59-0.34l-0.13-0.93C20.36,3.06,20.29,3,20.2,3h-1.4 c-0.09,0-0.16,0.06-0.17,0.15L18.5,4.08c-0.21,0.09-0.41,0.21-0.59,0.34l-0.87-0.35c-0.08-0.03-0.17,0-0.21,0.08l-0.7,1.21 c-0.04,0.08-0.03,0.17,0.04,0.22l0.74,0.58c-0.02,0.11-0.03,0.23-0.03,0.34c0,0.11,0.01,0.23,0.03,0.34l-0.74,0.58 c-0.07,0.05-0.08,0.15-0.04,0.22l0.7,1.21c0.04,0.08,0.14,0.1,0.21,0.08l0.87-0.35c0.18,0.14,0.38,0.25,0.59,0.34l0.13,0.93 C18.64,9.94,18.71,10,18.8,10h1.4c0.09,0,0.16-0.06,0.17-0.15l0.13-0.93c0.21-0.09,0.41-0.21,0.59-0.34l0.87,0.35 c0.08,0.03,0.17,0,0.21-0.08l0.7-1.21c0.04-0.08,0.03-0.17-0.04-0.22L22.1,6.84z M19.5,7.75c-0.69,0-1.25-0.56-1.25-1.25 s0.56-1.25,1.25-1.25s1.25,0.56,1.25,1.25S20.19,7.75,19.5,7.75z"></path><path d="M19.92,11.68l-0.5-0.87c-0.03-0.06-0.1-0.08-0.15-0.06l-0.62,0.25c-0.13-0.1-0.27-0.18-0.42-0.24l-0.09-0.66 C18.12,10.04,18.06,10,18,10h-1c-0.06,0-0.11,0.04-0.12,0.11l-0.09,0.66c-0.15,0.06-0.29,0.15-0.42,0.24l-0.62-0.25 c-0.06-0.02-0.12,0-0.15,0.06l-0.5,0.87c-0.03,0.06-0.02,0.12,0.03,0.16l0.53,0.41c-0.01,0.08-0.02,0.16-0.02,0.24 c0,0.08,0.01,0.17,0.02,0.24l-0.53,0.41c-0.05,0.04-0.06,0.11-0.03,0.16l0.5,0.87c0.03,0.06,0.1,0.08,0.15,0.06l0.62-0.25 c0.13,0.1,0.27,0.18,0.42,0.24l0.09,0.66C16.89,14.96,16.94,15,17,15h1c0.06,0,0.12-0.04,0.12-0.11l0.09-0.66 c0.15-0.06,0.29-0.15,0.42-0.24l0.62,0.25c0.06,0.02,0.12,0,0.15-0.06l0.5-0.87c0.03-0.06,0.02-0.12-0.03-0.16l-0.52-0.41 c0.01-0.08,0.02-0.16,0.02-0.24c0-0.08-0.01-0.17-0.02-0.24l0.53-0.41C19.93,11.81,19.94,11.74,19.92,11.68z M17.5,13.33 c-0.46,0-0.83-0.38-0.83-0.83c0-0.46,0.38-0.83,0.83-0.83s0.83,0.38,0.83,0.83C18.33,12.96,17.96,13.33,17.5,13.33z"></path><path d="M4.74,9h8.53c0.27,0,0.49-0.22,0.49-0.49V8.49c0-0.27-0.22-0.49-0.49-0.49H13c0-1.48-0.81-2.75-2-3.45V5.5 C11,5.78,10.78,6,10.5,6S10,5.78,10,5.5V4.14C9.68,4.06,9.35,4,9,4S8.32,4.06,8,4.14V5.5C8,5.78,7.78,6,7.5,6S7,5.78,7,5.5V4.55 C5.81,5.25,5,6.52,5,8H4.74C4.47,8,4.25,8.22,4.25,8.49v0.03C4.25,8.78,4.47,9,4.74,9z"></path><path d="M9,13c1.86,0,3.41-1.28,3.86-3H5.14C5.59,11.72,7.14,13,9,13z"></path></g></g></svg><div class="mud-nav-link-text"><!--!-->
+            Contractors
+        </div></a></div></nav></div></div></div></nav><!--!-->
+
+    <!--!--><nav class="mud-nav-group" aria-label="Settings"><button tabindex="0" class="mud-nav-link mud-ripple" aria-controls="j4wzb4ve9" aria-expanded="false" aria-label="Toggle Settings"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-nav-link-icon mud-nav-link-icon-default" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><g><path d="M0,0h24v24H0V0z" fill="none"></path><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"></path></g></svg><div class="mud-nav-link-text">Settings</div><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium mud-nav-link-expand-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 10l5 5 5-5z"></path></svg></button><!--!-->
+    <!--!--><div aria-hidden="true" class="mud-collapse-container invisible mud-navgroup-collapse" style=""><div class="mud-collapse-wrapper"><div class="mud-collapse-wrapper-inner"><!--!--><!--!--><nav id="j4wzb4ve9" class="mud-navmenu mud-navmenu-default mud-navmenu-margin-none"><!--!--><!--!--><div class="mud-nav-item"><!--!--><a href="settings/categories" rel="" tabindex="-1" class="mud-nav-link mud-ripple"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-nav-link-icon mud-nav-link-icon-default" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M12 2l-5.5 9h11z"></path><circle cx="17.5" cy="17.5" r="4.5"></circle><path d="M3 13.5h8v8H3z"></path></svg><div class="mud-nav-link-text"><!--!-->
+            Categories
+        </div></a></div></nav></div></div></div></nav></nav></div></aside><!--!-->
+<!--!--><!--!-->
+
+    <!--!--><div class="mud-main-content"><!--!--><div class="mud-container mud-container-maxwidth-xl mud-container--gutters pa-4"><!--!--><!--!--><!--!--><!--!-->
+
+<!--!--><!--!--><h4 class="mud-typography mud-typography-h4 mb-4">New Improvement</h4><!--!--><form method="post"><!--!--><!--!--><input type="hidden" name="__RequestVerificationToken" value="CfDJ8ENyF3tNC8FLnK5D-6lJHbWnJeoKtQtFUHsFlC7DkNQqRaMolD0Cf5V6vp26mGJPgtXCyVRdOaip0XpyZIaeLexTKNUIvadIDKA7RDGrLJnNm1iee__-SNvT9ZR1pWaU9qj_U-NiMPgOwqRkxFTdXRo"><!--!--><!--!--><!--!-->
+
+        <!--!--><!--!--><div class="mud-grid mud-grid-spacing-xs-6 justify-start"><!--!--><div class="mud-grid-item mud-grid-item-xs-12"><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-required mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed mb-3"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text" id="mudinputn1ektstj" type="text" inputmode="text" maxlength="524288" aria-invalid="false" required="" aria-required="true" _bl_2c7b05bf-5258-411b-b68d-5cd96e961ef4=""><div class="mud-input-slot mud-input-root mud-input-root-text" style="display:none" tabindex="-1" _bl_4a7eb54d-e21e-4454-90a5-bce3acb42b53=""></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputn1ektstj">Title</label></div></div></div><!--!-->
+
+            <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><div class="mud-select" id="select9z1je7ip"><!--!--><div class="mud-input-control mud-input-required mud-input-text-with-label mud-select mb-3"><div class="mud-input-control-input-container"><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-adorned-end mud-input-underline mud-shrink mud-typography-subtitle1 mud-select-input mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end mud-select-input" id="mudinput2ybkv9b3" type="text" readonly="" inputmode="text" maxlength="524288" aria-invalid="false" required="" aria-required="true" _bl_3d1b0b27-6313-49c0-9381-2b05ebb4a719=""><div class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end mud-select-input" style="display:none" tabindex="-1" _bl_b16e5bfb-de21-4663-bde4-f8b08ca9fe20=""></div><!--!--><div class="mud-input-adornment mud-input-adornment-end mud-select-input"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-input-adornment-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img" tabindex="-1"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 14l5-5 5 5z"></path></svg></div></div><!--!--><div id="popover-1fc3b109-d757-4033-a1f1-373b27c68a4f" class="mud-popover-cascading-value"></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinput2ybkv9b3">Property</label></div></div></div><!--!-->
+    <!--!--><!--!--><!--!--><!--!--><!--!-->
+
+<!--!--><!--!--></div><!--!-->
+
+            <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><div class="mud-select" id="selectz8e9e6l4"><!--!--><div class="mud-input-control mud-input-required mud-input-text-with-label mud-select mb-3"><div class="mud-input-control-input-container"><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-adorned-end mud-input-underline mud-shrink mud-typography-subtitle1 mud-select-input mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end mud-select-input" id="mudinputw3o508ic" type="text" readonly="" inputmode="text" maxlength="524288" aria-invalid="false" required="" aria-required="true" _bl_326a600e-767f-4d0a-8c85-eb13496ee80e=""><div class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end mud-select-input" style="display:none" tabindex="-1" _bl_650225c4-da60-40a3-a766-01e7d40de324=""></div><!--!--><div class="mud-input-adornment mud-input-adornment-end mud-select-input"><!--!--><svg class="mud-icon-root mud-icon-default mud-svg-icon mud-icon-size-medium mud-input-adornment-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img" tabindex="-1"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 10l5 5 5-5z"></path></svg></div></div><!--!--><div id="popover-ebd5f8c8-c0e5-484f-950d-3d39cfb76dec" class="mud-popover-cascading-value"></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputw3o508ic">Category</label></div></div></div><!--!-->
+    <!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!--><!--!-->
+
+<!--!--></div><!--!-->
+
+            <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><div class="mud-picker mud-picker-inline mud-picker-input-button mb-3" id="pickercmhfdkq5"><!--!--><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-required mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-adorned-end mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end" id="mudinput3urr9d9d" type="text" readonly="" inputmode="text" maxlength="524288" aria-invalid="false" required="" aria-required="true" _bl_f3ca16fd-7587-4afa-af10-e8d7d8d185ab=""><div class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end" style="display:none" tabindex="-1" _bl_1486d604-e554-4bf6-b2ee-f57041235e0c=""></div><!--!--><div class="mud-input-adornment mud-input-adornment-end"><!--!--><!--!--><button aria-label="Open" tabindex="-1" type="button" class="mud-button-root mud-icon-button mud-ripple mud-ripple-icon mud-icon-button-edge-end mud-input-adornment-icon-button mud-no-activator" _bl_33cde1a4-dfa7-4434-9142-a34b3bece866=""><span class="mud-icon-button-label"><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path></svg></span></button></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinput3urr9d9d">Date Completed</label></div></div><!--!--><div id="popover-f4a9718c-de9f-417b-8990-1d1ed9532d98" class="mud-popover-cascading-value"></div></div><!--!--></div><!--!-->
+
+            <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><!--!--><div id="numericFieldgerc7ekt" class="mud-input-control mud-input-text-with-label mud-input-input-control mud-input-number-control mud-input-showspin mb-3"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-adorned-start mud-input-underline mud-shrink mud-typography-subtitle1 mud-input-sizing-fixed"><!--!--><div class="mud-input-adornment mud-input-adornment-start mud-text"><!--!--><!--!--><p tabindex="-1" class="mud-typography mud-typography-body1 mud-input-adornment-text">$</p></div><input class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-start" step="any" id="mudinputxb9cyxz8" type="text" inputmode="decimal" maxlength="524288" aria-invalid="false" aria-required="false" _bl_c32094fa-d7de-479a-9f6b-182572832b2d=""><div class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-start" style="display:none" tabindex="-1" _bl_99859ca7-c780-43aa-b2a1-03bd13275700=""></div><div class="mud-input-numeric-spin"><!--!--><!--!--><button tabindex="-1" aria-label="Increment" type="button" class="mud-button-root mud-button mud-button-text mud-button-text-default mud-button-text-size-medium mud-ripple" _bl_b9527764-5ee9-4863-9ee1-61b09cd08ead=""><span class="mud-button-label"><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg></span></button><!--!-->
+
+            <!--!--><!--!--><button tabindex="-1" aria-label="Decrement" type="button" class="mud-button-root mud-button mud-button-text mud-button-text-default mud-button-text-size-medium mud-ripple" _bl_2c096f15-fa0a-4af5-93b5-ed226930dc02=""><span class="mud-button-label"><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg></span></button></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputxb9cyxz8">Cost</label></div></div></div><!--!-->
+
+            <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><div id="oka82jczo" class="mud-select mud-autocomplete"><!--!--><div class="mud-input-control mud-input-text-with-label mud-select mb-3"><div class="mud-input-control-input-container"><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-adorned-end mud-input-underline mud-typography-subtitle1 mud-select-input mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end mud-select-input" autocomplete="off" id="mudinputbeg9ztxg" type="text" inputmode="text" maxlength="524288" aria-invalid="false" aria-required="false" _bl_5988d012-13ec-474d-ba5b-dc922efa7ea5=""><div class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end mud-select-input" style="display:none" tabindex="-1" _bl_bed183cb-b124-49ad-a13c-f860b7bd03d0=""></div><!--!--><div class="mud-input-adornment mud-input-adornment-end mud-select-input"><!--!--><!--!--><button tabindex="-1" type="button" class="mud-button-root mud-icon-button mud-ripple mud-ripple-icon mud-icon-button-edge-end mud-input-adornment-icon-button mud-no-activator" _bl_35112eaa-8ddc-41a5-96c1-ec0c4ce4cdef=""><span class="mud-icon-button-label"><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 10l5 5 5-5z"></path></svg></span></button></div></div><!--!--><div id="popover-dbc5acff-358e-49af-b27c-d3b60620bb89" class="mud-popover-cascading-value"></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputbeg9ztxg">Contractor (leave blank for DIY)</label></div></div></div><!--!-->
+
+<!--!--></div><!--!-->
+
+            <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><div class="mud-picker mud-picker-inline mud-picker-input-button mb-3" id="pickerhx4r1fnm"><!--!--><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-adorned-end mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end" id="mudinputzxofp48q" type="text" readonly="" inputmode="text" maxlength="524288" aria-invalid="false" aria-required="false" _bl_af89e352-7e96-4cf1-a029-092c1fab0c45=""><div class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end" style="display:none" tabindex="-1" _bl_50f7a428-8a09-4ba3-907f-b08377e601c4=""></div><!--!--><div class="mud-input-adornment mud-input-adornment-end"><!--!--><!--!--><button aria-label="Open" tabindex="-1" type="button" class="mud-button-root mud-icon-button mud-ripple mud-ripple-icon mud-icon-button-edge-end mud-input-adornment-icon-button mud-no-activator" _bl_1534cae7-4d1f-4fcd-a5bc-91a10bc5a22f=""><span class="mud-icon-button-label"><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path></svg></span></button></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputzxofp48q">Warranty Expiration</label></div></div><!--!--><div id="popover-c2ae71a6-461e-4f6e-9a3a-33ffba61af45" class="mud-popover-cascading-value"></div></div><!--!--></div><!--!-->
+
+            <!--!--><div class="mud-grid-item mud-grid-item-xs-12"><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed mb-3"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><textarea class="mud-input-slot mud-input-root mud-input-root-text" rows="4" id="mudinputp7qtet7z" type="text" inputmode="text" maxlength="524288" aria-invalid="false" aria-required="false" _bl_d64056f1-9620-4cd2-a066-072b56ad36ab=""></textarea></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputp7qtet7z">Detailed Notes</label></div></div></div></div><!--!-->
+
+        <!--!--><div class="mud-expansion-panels mb-4"><!--!--><!--!--><div class="mud-expand-panel mud-elevation-1 mud-expand-panel-border"><div class="mud-expand-panel-header mud-expand-panel-header-gutters" tabindex="0"><div class="mud-expand-panel-text">Manufacturer Info</div><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium mud-expand-panel-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg></div><!--!-->
+    <!--!--><div class="mud-collapse-container invisible" style=""><div class="mud-collapse-wrapper"><div class="mud-collapse-wrapper-inner"><div class="mud-expand-panel-content mud-expand-panel-gutters"><!--!--><!--!--><div class="mud-grid mud-grid-spacing-xs-6 justify-start"><!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed mb-3"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text" id="mudinput9wovlrdz" type="text" inputmode="text" maxlength="524288" aria-invalid="false" aria-required="false" _bl_2acf46de-d2a3-491c-92c1-a6813ae43377=""><div class="mud-input-slot mud-input-root mud-input-root-text" style="display:none" tabindex="-1" _bl_8b990dd8-78cc-411d-8f47-403599d12e45=""></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinput9wovlrdz">Manufacturer Name</label></div></div></div><!--!-->
+                    <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed mb-3"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text" id="mudinputis5o1ppf" type="text" inputmode="text" maxlength="524288" aria-invalid="false" aria-required="false" _bl_bebbce2e-ca2b-4ce5-bc5b-07f22af570ea=""><div class="mud-input-slot mud-input-root mud-input-root-text" style="display:none" tabindex="-1" _bl_c908191c-a6b6-4f03-94c3-ceb751da61f6=""></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputis5o1ppf">Model</label></div></div></div><!--!-->
+                    <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed mb-3"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text" id="mudinputq214lxhk" type="text" inputmode="text" maxlength="524288" aria-invalid="false" aria-required="false" _bl_306b15bd-2856-484a-877e-69c009de7fda=""><div class="mud-input-slot mud-input-root mud-input-root-text" style="display:none" tabindex="-1" _bl_c968273f-edf5-4611-b88f-72476f94eb5d=""></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinputq214lxhk">Serial Number</label></div></div></div><!--!-->
+                    <!--!--><div class="mud-grid-item mud-grid-item-xs-12 mud-grid-item-md-6"><!--!--><!--!--><div class="mud-picker mud-picker-inline mud-picker-input-button mb-3" id="pickerynimvco6"><!--!--><!--!--><!--!--><!--!--><div class="mud-input-control mud-input-text-with-label mud-input-input-control mud-input-sizing-fixed"><div class="mud-input-control-input-container"><!--!--><!--!--><div class="mud-input mud-input-text mud-input-text-with-label mud-input-adorned-end mud-input-underline mud-typography-subtitle1 mud-input-sizing-fixed"><input class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end" id="mudinput0i8bfg2z" type="text" readonly="" inputmode="text" maxlength="524288" aria-invalid="false" aria-required="false" _bl_b9c05f5b-f072-4b0c-b934-354ec60deedb=""><div class="mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-end" style="display:none" tabindex="-1" _bl_a8a1dfe6-8e1e-40cb-9e72-b83eaa839541=""></div><!--!--><div class="mud-input-adornment mud-input-adornment-end"><!--!--><!--!--><button aria-label="Open" tabindex="-1" type="button" class="mud-button-root mud-icon-button mud-ripple mud-ripple-icon mud-icon-button-edge-end mud-input-adornment-icon-button mud-no-activator" _bl_64f7b81a-7d1c-4ad6-951a-ef5405537e7f=""><span class="mud-icon-button-label"><!--!--><svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"></path></svg></span></button></div></div><!--!--><label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol" for="mudinput0i8bfg2z">Manufacturer Warranty Expiration</label></div></div><!--!--><div id="popover-70fc95e6-eec8-47fe-90cc-3ad6d1b53b3f" class="mud-popover-cascading-value"></div></div><!--!--></div></div></div></div></div></div></div></div><!--!-->
+
+        <!--!--><!--!--><div role="group" class="d-flex flex-row gap-2 mt-2"><!--!--><!--!--><button type="submit" class="mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium mud-ripple" _bl_afa7a195-b8db-4d33-8193-b09a6d6325d4=""><span class="mud-button-label"><!--!-->
+                Save
+            </span></button><!--!-->
+            <!--!--><!--!--><button type="button" class="mud-button-root mud-button mud-button-text mud-button-text-default mud-button-text-size-medium mud-ripple" _bl_63816099-2e99-4563-95eb-b618e3530e2b=""><span class="mud-button-label">Cancel</span></button></div></form></div></div></div><!--!-->
+        <!--!-->
+    <script src="_framework/blazor.web.2i0r6wwb69.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script></body></html>

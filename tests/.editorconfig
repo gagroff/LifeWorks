@@ -1,0 +1,5 @@
+root = false
+
+[*.cs]
+# Test method names conventionally use underscores (e.g. Method_Scenario_Result)
+dotnet_diagnostic.CA1707.severity = none

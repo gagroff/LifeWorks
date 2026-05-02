@@ -1,0 +1,212 @@
+@page "/improvements/new"
+@page "/improvements/{Id:guid}/edit"
+@inject IHomeImprovementService HomeImprovementService
+@inject IPropertyService PropertyService
+@inject ICategoryService CategoryService
+@inject IContractorService ContractorService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>@(_isEditMode ? "Edit Improvement" : "New Improvement")</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">@(_isEditMode ? "Edit Improvement" : "New Improvement")</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_model.Title"
+                              Label="Title"
+                              Required="true"
+                              For="() => _model.Title"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudSelect T="Guid" Label="Property" @bind-Value="_model.PropertyId" Required="true" For="() => _model.PropertyId" Class="mb-3">
+                    @foreach (var p in _properties)
+                    {
+                        <MudSelectItem T="Guid" Value="p.Id">@p.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudSelect T="Guid" Label="Category" @bind-Value="_model.CategoryId" Required="true" For="() => _model.CategoryId" Class="mb-3">
+                    @foreach (var c in _categories)
+                    {
+                        <MudSelectItem T="Guid" Value="c.Id">@c.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudDatePicker Editable="true" Label="Date Completed"
+                               Required="true"
+                               Date="_dateCompleted"
+                               DateChanged="d => _dateCompleted = d"
+                               DateFormat="MM/dd/yyyy"
+                               Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudNumericField T="decimal?" @bind-Value="_model.Cost"
+                                 Label="Cost"
+                                 Adornment="Adornment.Start"
+                                 AdornmentText="$"
+                                 Format="F2"
+                                 Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudAutocomplete T="Contractor"
+                                 Label="Contractor (leave blank for DIY)"
+                                 @bind-Value="_selectedContractor"
+                                 SearchFunc="SearchContractorsAsync"
+                                 ToStringFunc="c => c?.Name ?? string.Empty"
+                                 Clearable="true"
+                                 Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudDatePicker Editable="true" Label="Warranty Expiration"
+                               Date="_warrantyExpiration"
+                               DateChanged="d => _warrantyExpiration = d"
+                               DateFormat="MM/dd/yyyy"
+                               Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_model.DetailedNotes"
+                              Label="Detailed Notes"
+                              Lines="4"
+                              Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <MudExpansionPanels Class="mb-4">
+            <MudExpansionPanel Text="Manufacturer Info">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_model.ManufacturerName"
+                                      Label="Manufacturer Name"
+                                      Class="mb-3" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_model.ManufacturerModel"
+                                      Label="Model"
+                                      Class="mb-3" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_model.ManufacturerSerialNumber"
+                                      Label="Serial Number"
+                                      Class="mb-3" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudDatePicker Editable="true" Label="Manufacturer Warranty Expiration"
+                                       Date="_manufacturerWarrantyExpiration"
+                                       DateChanged="d => _manufacturerWarrantyExpiration = d"
+                                       DateFormat="MM/dd/yyyy"
+                                       Class="mb-3" />
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+
+        <MudStack Row="true" Spacing="2" Class="mt-2">
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Save
+            </MudButton>
+            <MudButton Variant="Variant.Text" OnClick="BackToList">Cancel</MudButton>
+        </MudStack>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private HomeImprovement _model = new();
+    private List<Property> _properties = [];
+    private List<Category> _categories = [];
+    private Contractor? _selectedContractor;
+    private DateTime? _dateCompleted;
+    private DateTime? _warrantyExpiration;
+    private DateTime? _manufacturerWarrantyExpiration;
+    private bool _loading = true;
+    private bool _isEditMode;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _isEditMode = Id.HasValue;
+
+        _properties = await PropertyService.GetAllAsync();
+        _categories = await CategoryService.GetAllAsync();
+
+        if (_isEditMode)
+        {
+            var existing = await HomeImprovementService.GetByIdAsync(Id!.Value);
+            if (existing is null)
+            {
+                Snackbar.Add("Improvement not found.", Severity.Error);
+                Navigation.NavigateTo("/improvements");
+                return;
+            }
+
+            _model = existing;
+            _selectedContractor = existing.Contractor;
+            _dateCompleted = existing.DateCompleted == default ? null : existing.DateCompleted.ToDateTime(TimeOnly.MinValue);
+            _warrantyExpiration = existing.WarrantyExpiration.HasValue ? existing.WarrantyExpiration.Value.ToDateTime(TimeOnly.MinValue) : null;
+            _manufacturerWarrantyExpiration = existing.ManufacturerWarrantyExpiration.HasValue ? existing.ManufacturerWarrantyExpiration.Value.ToDateTime(TimeOnly.MinValue) : null;
+        }
+        else
+        {
+            _model = new HomeImprovement();
+            _selectedContractor = null;
+            _dateCompleted = null;
+            _warrantyExpiration = null;
+            _manufacturerWarrantyExpiration = null;
+        }
+
+        _loading = false;
+    }
+
+    private async Task<IEnumerable<Contractor>> SearchContractorsAsync(string? term, CancellationToken ct)
+    {
+        var results = await ContractorService.GetAllAsync(term);
+        return results;
+    }
+
+    private async Task SaveAsync()
+    {
+        _model.ContractorId = _selectedContractor?.Id;
+        _model.DateCompleted = _dateCompleted.HasValue ? DateOnly.FromDateTime(_dateCompleted.Value) : DateOnly.FromDateTime(DateTime.Today);
+        _model.WarrantyExpiration = _warrantyExpiration.HasValue ? DateOnly.FromDateTime(_warrantyExpiration.Value) : null;
+        _model.ManufacturerWarrantyExpiration = _manufacturerWarrantyExpiration.HasValue ? DateOnly.FromDateTime(_manufacturerWarrantyExpiration.Value) : null;
+
+        if (_isEditMode)
+        {
+            await HomeImprovementService.UpdateAsync(_model);
+            Snackbar.Add("Improvement updated", Severity.Success);
+        }
+        else
+        {
+            await HomeImprovementService.AddAsync(_model);
+            Snackbar.Add("Improvement added", Severity.Success);
+        }
+
+        Navigation.NavigateTo("/improvements");
+    }
+
+    private void BackToList() => Navigation.NavigateTo("/improvements");
+}

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace LifeWorks.Domain.Entities;
 
 public class HomeImprovement
@@ -7,6 +9,8 @@ public class HomeImprovement
     public Guid CategoryId { get; set; }
     public Guid? ContractorId { get; set; }
 
+    [Required]
+    [MaxLength(300)]
     public string Title { get; set; } = string.Empty;
     public string? DetailedNotes { get; set; }
     public DateOnly DateCompleted { get; set; }
