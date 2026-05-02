@@ -1,47 +1,184 @@
 @page "/"
+@inject IHomeImprovementService HomeImprovementService
 
 <PageTitle>LifeWorks</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">Welcome to LifeWorks</MudText>
-<MudText Typo="Typo.body1" Class="mb-6">Track home improvements, contractors, and property history in one place.</MudText>
+<MudText Typo="Typo.h4" GutterBottom="true">Dashboard</MudText>
 
-<MudGrid>
-    <MudItem xs="12" sm="4">
-        <MudCard>
-            <MudCardContent>
-                <MudIcon Icon="@Icons.Material.Filled.Build" Color="Color.Primary" Size="Size.Large" Class="mb-2" />
-                <MudText Typo="Typo.h6">Home Improvements</MudText>
-                <MudText Typo="Typo.body2">Log and track repairs, upgrades, and projects across your properties.</MudText>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Href="/improvements" Variant="Variant.Filled" Color="Color.Primary">View Improvements</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
+@if (_loading)
+{
+    <MudGrid>
+        @for (int i = 0; i < 3; i++)
+        {
+            <MudItem xs="12" sm="4">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" />
+            </MudItem>
+        }
+    </MudGrid>
+}
+else
+{
+    @* ── Summary Stats ── *@
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="4">
+            <MudPaper Class="pa-4 d-flex flex-column align-center" Elevation="2">
+                <MudIcon Icon="@Icons.Material.Filled.Build" Color="Color.Primary" Size="Size.Large" Class="mb-1" />
+                <MudText Typo="Typo.h4">@_totalCount</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Total Improvements</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Class="pa-4 d-flex flex-column align-center" Elevation="2">
+                <MudIcon Icon="@Icons.Material.Filled.AttachMoney" Color="Color.Success" Size="Size.Large" Class="mb-1" />
+                <MudText Typo="Typo.h4">@_totalSpend.ToString("C0")</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Total Spend (All Time)</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Class="pa-4 d-flex flex-column align-center" Elevation="2">
+                <MudIcon Icon="@Icons.Material.Filled.Shield" Color="Color.Warning" Size="Size.Large" Class="mb-1" />
+                <MudText Typo="Typo.h4">@_expiringWarranties.Count</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Warranties Expiring (90 days)</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
-    <MudItem xs="12" sm="4">
-        <MudCard>
-            <MudCardContent>
-                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Secondary" Size="Size.Large" Class="mb-2" />
-                <MudText Typo="Typo.h6">Contractors</MudText>
-                <MudText Typo="Typo.body2">Manage your trusted contractors and their contact information.</MudText>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Href="/contractors" Variant="Variant.Filled" Color="Color.Secondary">View Contractors</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
+    <MudGrid>
+        @* ── Cost by Property ── *@
+        <MudItem xs="12" md="4">
+            <MudText Typo="Typo.h6" Class="mb-2">Spend by Property</MudText>
+            @if (_costByProperty.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">No data yet.</MudText>
+            }
+            else
+            {
+                @foreach (var (propertyName, totalCost) in _costByProperty)
+                {
+                    <MudPaper Class="pa-3 mb-2" Elevation="1">
+                        <MudText Typo="Typo.subtitle2">@propertyName</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@totalCost.ToString("C0")</MudText>
+                    </MudPaper>
+                }
+            }
+        </MudItem>
 
-    <MudItem xs="12" sm="4">
-        <MudCard>
-            <MudCardContent>
-                <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Tertiary" Size="Size.Large" Class="mb-2" />
-                <MudText Typo="Typo.h6">Categories</MudText>
-                <MudText Typo="Typo.body2">Customize the categories used to organize your improvements.</MudText>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Href="/settings/categories" Variant="Variant.Filled" Color="Color.Tertiary">Manage Categories</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
-</MudGrid>
+        @* ── Cost by Category Chart ── *@
+        <MudItem xs="12" md="8">
+            <MudText Typo="Typo.h6" Class="mb-2">Spend by Category</MudText>
+            @if (_costByCategory.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">No data yet.</MudText>
+            }
+            else
+            {
+                <MudChart ChartType="ChartType.Bar"
+                          ChartSeries="_categorySeries"
+                          ChartLabels="_categoryLabels"
+                          Width="100%"
+                          Height="300px" />
+            }
+        </MudItem>
+
+        @* ── Warranty Alerts ── *@
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h6" Class="mb-2">Warranty Alerts</MudText>
+            @if (_expiringWarranties.Count == 0)
+            {
+                <MudPaper Class="pa-3" Elevation="1">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">No warranties expiring in the next 90 days.</MudText>
+                </MudPaper>
+            }
+            else
+            {
+                <MudList T="string" Dense="true">
+                    @foreach (var item in _expiringWarranties)
+                    {
+                        var daysLeft = item.WarrantyExpiration!.Value.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+                        var chipColor = daysLeft < 0 ? Color.Error : daysLeft <= 30 ? Color.Warning : Color.Success;
+                        var label = daysLeft < 0 ? "Expired" : daysLeft == 0 ? "Today" : $"{daysLeft}d left";
+                        <MudListItem>
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                <MudLink Href="@($"/improvements/{item.Id}")">@item.Title</MudLink>
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Property?.Name</MudText>
+                                    <MudChip T="string" Color="@chipColor" Size="Size.Small">@label</MudChip>
+                                </MudStack>
+                            </MudStack>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+        </MudItem>
+
+        @* ── Recent Activity ── *@
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h6" Class="mb-2">Recent Activity</MudText>
+            @if (_recentImprovements.Count == 0)
+            {
+                <MudPaper Class="pa-3" Elevation="1">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">No improvements recorded yet.</MudText>
+                </MudPaper>
+            }
+            else
+            {
+                <MudList T="string" Dense="true">
+                    @foreach (var item in _recentImprovements)
+                    {
+                        <MudListItem>
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                <div>
+                                    <MudLink Href="@($"/improvements/{item.Id}")">@item.Title</MudLink>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Property?.Name · @item.DateCompleted.ToString("MM/dd/yyyy")</MudText>
+                                </div>
+                                @if (item.Cost.HasValue)
+                                {
+                                    <MudText Typo="Typo.body2">@item.Cost.Value.ToString("C0")</MudText>
+                                }
+                            </MudStack>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private bool _loading = true;
+
+    private int _totalCount;
+    private decimal _totalSpend;
+
+    private List<(string PropertyName, decimal TotalCost)> _costByProperty = [];
+    private List<(string CategoryName, decimal TotalCost)> _costByCategory = [];
+    private List<HomeImprovement> _expiringWarranties = [];
+    private List<HomeImprovement> _recentImprovements = [];
+
+    private List<ChartSeries<double>> _categorySeries = [];
+    private string[] _categoryLabels = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var improvements = await HomeImprovementService.GetAllAsync();
+        _totalCount = improvements.Count;
+        _totalSpend = await HomeImprovementService.GetTotalCostAsync();
+
+        _costByProperty = await HomeImprovementService.GetCostByPropertyAsync();
+        _costByCategory = await HomeImprovementService.GetCostByCategoryAsync();
+        _expiringWarranties = await HomeImprovementService.GetExpiringWarrantiesAsync(90);
+        _recentImprovements = await HomeImprovementService.GetRecentAsync(5);
+
+        _categoryLabels = [.. _costByCategory.Select(x => x.CategoryName)];
+        _categorySeries =
+        [
+            new ChartSeries<double>
+            {
+                Name = "Spend",
+                Data = new ChartData<double>(_costByCategory.Select(x => (double)x.TotalCost).ToList())
+            }
+        ];
+
+        _loading = false;
+    }
+}
