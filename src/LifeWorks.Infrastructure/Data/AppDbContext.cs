@@ -9,6 +9,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Contractor> Contractors => Set<Contractor>();
     public DbSet<HomeImprovement> HomeImprovements => Set<HomeImprovement>();
+    public DbSet<Attachment> Attachments => Set<Attachment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,6 +58,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithMany(x => x.HomeImprovements)
                 .HasForeignKey(x => x.ContractorId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Attachment>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.FileName).HasMaxLength(500).IsRequired();
+            e.Property(x => x.StoredFileName).HasMaxLength(500).IsRequired();
+            e.Property(x => x.ContentType).HasMaxLength(200).IsRequired();
+
+            e.HasOne(x => x.HomeImprovement)
+                .WithMany(x => x.Attachments)
+                .HasForeignKey(x => x.HomeImprovementId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         SeedData(modelBuilder);

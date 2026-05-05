@@ -91,6 +91,16 @@ else
                     @(context.Item.Cost.HasValue ? context.Item.Cost.Value.ToString("C") : string.Empty)
                 </CellTemplate>
             </TemplateColumn>
+            <TemplateColumn Title="Files" Sortable="false">
+                <CellTemplate>
+                    @if (context.Item.Attachments.Count > 0)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Filled.AttachFile">
+                            @context.Item.Attachments.Count
+                        </MudChip>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
             <TemplateColumn Title="Actions" Sortable="false">
                 <CellTemplate>
                     <MudIconButton Icon="@Icons.Material.Filled.Visibility"

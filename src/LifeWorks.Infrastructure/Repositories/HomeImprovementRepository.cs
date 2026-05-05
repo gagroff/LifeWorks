@@ -13,7 +13,8 @@ public class HomeImprovementRepository(AppDbContext context) : RepositoryBase<Ho
         var query = ApplyFilter(Context.HomeImprovements
             .Include(h => h.Property)
             .Include(h => h.Category)
-            .Include(h => h.Contractor), filter);
+            .Include(h => h.Contractor)
+            .Include(h => h.Attachments), filter);
 
         return await query.OrderByDescending(h => h.DateCompleted).ToListAsync();
     }
@@ -23,6 +24,7 @@ public class HomeImprovementRepository(AppDbContext context) : RepositoryBase<Ho
             .Include(h => h.Property)
             .Include(h => h.Category)
             .Include(h => h.Contractor)
+            .Include(h => h.Attachments)
             .FirstOrDefaultAsync(h => h.Id == id);
 
     public async Task<decimal> GetTotalCostAsync(HomeImprovementFilter filter)

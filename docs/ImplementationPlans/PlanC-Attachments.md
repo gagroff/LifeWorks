@@ -7,7 +7,7 @@ Home improvement records are only as useful as the proof behind them — receipt
 
 ## Phase 1 — Domain & Infrastructure: New Entity + Migration
 
-- [ ] **Task C1.1** — Create `Attachment` domain entity
+- [x] **Task C1.1** — Create `Attachment` domain entity
   - **File:** `src/LifeWorks.Domain/Entities/Attachment.cs`
   - ```csharp
     public class Attachment
@@ -24,19 +24,19 @@ Home improvement records are only as useful as the proof behind them — receipt
     }
     ```
 
-- [ ] **Task C1.2** — Add `Attachments` navigation property to `HomeImprovement`
+- [x] **Task C1.2** — Add `Attachments` navigation property to `HomeImprovement`
   - **File:** `src/LifeWorks.Domain/Entities/HomeImprovement.cs`
   - Add:
     ```csharp
     public ICollection<Attachment> Attachments { get; set; } = [];
     ```
 
-- [ ] **Task C1.3** — Configure `Attachment` in `AppDbContext`
+- [x] **Task C1.3** — Configure `Attachment` in `AppDbContext`
   - **File:** `src/LifeWorks.Infrastructure/Data/AppDbContext.cs`
   - Add `DbSet<Attachment> Attachments`
   - Configure relationship: cascade delete (deleting an improvement deletes its attachments)
 
-- [ ] **Task C1.4** — Add EF Core migration and update database
+- [x] **Task C1.4** — Add EF Core migration and update database
   - ```bash
     dotnet ef migrations add AddAttachments --project src/LifeWorks.Infrastructure --startup-project src/LifeWorks.Web
     dotnet ef database update --project src/LifeWorks.Infrastructure --startup-project src/LifeWorks.Web
@@ -46,7 +46,7 @@ Home improvement records are only as useful as the proof behind them — receipt
 
 ## Phase 2 — Application Layer: Attachment Service
 
-- [ ] **Task C2.1** — Create `IAttachmentRepository`
+- [x] **Task C2.1** — Create `IAttachmentRepository`
   - **File:** `src/LifeWorks.Application/Repositories/IAttachmentRepository.cs`
   - ```csharp
     public interface IAttachmentRepository : IRepository<Attachment>
@@ -55,11 +55,11 @@ Home improvement records are only as useful as the proof behind them — receipt
     }
     ```
 
-- [ ] **Task C2.2** — Implement `AttachmentRepository`
+- [x] **Task C2.2** — Implement `AttachmentRepository`
   - **File:** `src/LifeWorks.Infrastructure/Repositories/AttachmentRepository.cs`
   - Extend `RepositoryBase<Attachment>`; implement `GetByImprovementIdAsync` filtering by `HomeImprovementId`
 
-- [ ] **Task C2.3** — Create `IAttachmentService`
+- [x] **Task C2.3** — Create `IAttachmentService`
   - **File:** `src/LifeWorks.Application/Services/IAttachmentService.cs`
   - ```csharp
     public interface IAttachmentService
@@ -71,14 +71,14 @@ Home improvement records are only as useful as the proof behind them — receipt
     }
     ```
 
-- [ ] **Task C2.4** — Implement `AttachmentService`
+- [x] **Task C2.4** — Implement `AttachmentService`
   - **File:** `src/LifeWorks.Application/Services/AttachmentService.cs`
   - `SaveAsync`: generate GUID-based `StoredFileName`, write stream to upload folder, persist `Attachment` record
   - `GetFileAsync`: look up record, open `FileStream` from disk, return stream + metadata
   - `DeleteAsync`: delete DB record, delete file from disk
   - Upload folder read from `IConfiguration["Attachments:UploadPath"]` (default: `wwwroot/uploads`)
 
-- [ ] **Task C2.5** — Register services in DI
+- [x] **Task C2.5** — Register services in DI
   - **File:** `src/LifeWorks.Infrastructure/DependencyInjection.cs`
   - Register `IAttachmentRepository` → `AttachmentRepository`
   - Register `IAttachmentService` → `AttachmentService`
