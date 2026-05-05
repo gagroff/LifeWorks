@@ -1,4 +1,5 @@
 using LifeWorks.Application;
+using LifeWorks.Application.Services;
 using LifeWorks.Infrastructure;
 using LifeWorks.Infrastructure.Data;
 using LifeWorks.Web.Components;
@@ -40,5 +41,18 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapGet("/attachments/{id:guid}/download", async (Guid id, IAttachmentService attachmentService) =>
+{
+    try
+    {
+        var (fileStream, metadata) = await attachmentService.GetFileAsync(id);
+        return Results.File(fileStream, metadata.ContentType, metadata.FileName);
+    }
+    catch (FileNotFoundException)
+    {
+        return Results.NotFound();
+    }
+});
 
 app.Run();
