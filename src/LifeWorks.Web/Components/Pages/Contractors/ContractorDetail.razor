@@ -1,10 +1,10 @@
 @page "/contractors/{Id:guid}"
 @inject IContractorService ContractorService
+@inject IHomeImprovementService HomeImprovementService
 @inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 
-<PageTitle>Contractor Details</PageTitle>
-
-<MudText Typo="Typo.h4" Class="mb-4">Contractor Details</MudText>
+<PageTitle>@(_contractor?.Name ?? "Contractor")</PageTitle>
 
 @if (_loading)
 {
@@ -12,37 +12,115 @@
 }
 else if (_contractor is null)
 {
-    <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-4">
-        Contractor not found.
-    </MudAlert>
-
-    <MudButton Variant="Variant.Text" OnClick="BackToList">
-        Back
-    </MudButton>
+    <MudText>Contractor not found.</MudText>
 }
 else
 {
-    <MudCard>
-        <MudCardContent>
-            <MudText Typo="Typo.h6" Class="mb-2">@_contractor.Name</MudText>
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-4">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       OnClick="@(() => Navigation.NavigateTo("/contractors"))" />
+        <MudText Typo="Typo.h4">@_contractor.Name</MudText>
+        @if (_contractor.IsFavorite)
+        {
+            <MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" />
+        }
+        <MudSpacer />
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Filled.Edit"
+                   Href="@($"/contractors/{Id}/edit")">
+            Edit
+        </MudButton>
+    </MudStack>
 
-            <MudText Class="mb-1"><strong>Company:</strong> @DisplayOrDash(_contractor.CompanyName)</MudText>
-            <MudText Class="mb-1"><strong>Phone:</strong> @DisplayOrDash(_contractor.Phone)</MudText>
-            <MudText Class="mb-1"><strong>Email:</strong> @DisplayOrDash(_contractor.Email)</MudText>
-            <MudText Class="mb-1"><strong>Website:</strong> @DisplayOrDash(_contractor.Website)</MudText>
-            <MudText Class="mb-1"><strong>Notes:</strong> @DisplayOrDash(_contractor.Notes)</MudText>
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       OnClick="EditContractor">
-                Edit
-            </MudButton>
-            <MudButton Variant="Variant.Text" OnClick="BackToList">
-                Back
-            </MudButton>
-        </MudCardActions>
-    </MudCard>
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" md="6">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Class="mb-3">Contact Info</MudText>
+                    <MudStack Spacing="1">
+                        @if (!string.IsNullOrWhiteSpace(_contractor.CompanyName))
+                        {
+                            <MudText><strong>Company:</strong> @_contractor.CompanyName</MudText>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(_contractor.Trade))
+                        {
+                            <MudText><strong>Trade:</strong> @_contractor.Trade</MudText>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(_contractor.Phone))
+                        {
+                            <MudText><strong>Phone:</strong> @_contractor.Phone</MudText>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(_contractor.Email))
+                        {
+                            <MudText><strong>Email:</strong> @_contractor.Email</MudText>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(_contractor.Website))
+                        {
+                            <MudText><strong>Website:</strong> @_contractor.Website</MudText>
+                        }
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Class="mb-3">Rating & Notes</MudText>
+                    @if (_contractor.Rating.HasValue)
+                    {
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="mb-2">
+                            <MudText><strong>Rating:</strong></MudText>
+                            <MudRating ReadOnly="true" SelectedValue="_contractor.Rating.Value" MaxValue="5" />
+                        </MudStack>
+                    }
+                    else
+                    {
+                        <MudText Class="mb-2"><strong>Rating:</strong> Not rated</MudText>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(_contractor.Notes))
+                    {
+                        <MudText Style="white-space: pre-wrap">@_contractor.Notes</MudText>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <MudText Typo="Typo.h5" Class="mb-3">
+        Job History
+        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Class="ml-2">@_improvements.Count</MudChip>
+    </MudText>
+
+    @if (_improvements.Count == 0)
+    {
+        <MudText Color="Color.Secondary">No improvements linked to this contractor.</MudText>
+    }
+    else
+    {
+        <MudTable Items="_improvements" Hover="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Title</MudTh>
+                <MudTh>Property</MudTh>
+                <MudTh>Category</MudTh>
+                <MudTh>Date Completed</MudTh>
+                <MudTh>Cost</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudLink Href="@($"/improvements/{context.Id}")">@context.Title</MudLink>
+                </MudTd>
+                <MudTd>@context.Property.Name</MudTd>
+                <MudTd>@context.Category.Name</MudTd>
+                <MudTd>@context.DateCompleted.ToString("MMM d, yyyy")</MudTd>
+                <MudTd>@(context.Cost.HasValue ? context.Cost.Value.ToString("C") : "-")</MudTd>
+            </RowTemplate>
+            <FooterContent>
+                <MudTd colspan="4"><strong>Total</strong></MudTd>
+                <MudTd><strong>@_improvements.Where(i => i.Cost.HasValue).Sum(i => i.Cost!.Value).ToString("C")</strong></MudTd>
+            </FooterContent>
+        </MudTable>
+    }
 }
 
 @code {
@@ -50,25 +128,20 @@ else
     public Guid Id { get; set; }
 
     private Contractor? _contractor;
+    private List<HomeImprovement> _improvements = [];
     private bool _loading = true;
 
     protected override async Task OnParametersSetAsync()
     {
         _loading = true;
         _contractor = await ContractorService.GetByIdAsync(Id);
+
+        if (_contractor is not null)
+        {
+            _improvements = await HomeImprovementService.GetAllAsync(
+                new HomeImprovementFilter { ContractorId = Id });
+        }
+
         _loading = false;
     }
-
-    private void EditContractor()
-    {
-        Navigation.NavigateTo($"/contractors/{Id}/edit");
-    }
-
-    private void BackToList()
-    {
-        Navigation.NavigateTo("/contractors");
-    }
-
-    private static string DisplayOrDash(string? value) =>
-        string.IsNullOrWhiteSpace(value) ? "-" : value;
 }

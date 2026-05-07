@@ -66,4 +66,34 @@ public class ContractorServiceTests
         await _repo.Received(1).AddAsync(contractor);
         await _repo.Received(1).SaveChangesAsync();
     }
+
+    [Fact]
+    public async Task GetFavorites_ReturnsOnlyFavoriteContractors()
+    {
+        var favorites = new List<Contractor>
+        {
+            new() { Name = "Alice", IsFavorite = true },
+            new() { Name = "Bob",   IsFavorite = true }
+        };
+        _repo.GetFavoritesAsync().Returns(favorites);
+
+        var result = await _sut.GetFavoritesAsync();
+
+        Assert.Equal(favorites, result);
+        Assert.All(result, c => Assert.True(c.IsFavorite));
+        await _repo.Received(1).GetFavoritesAsync();
+    }
+
+    [Fact]
+    public async Task GetDistinctTrades_ReturnsUniqueValues()
+    {
+        var trades = new List<string> { "Electrical", "HVAC", "Plumbing" };
+        _repo.GetDistinctTradesAsync().Returns(trades);
+
+        var result = await _sut.GetDistinctTradesAsync();
+
+        Assert.Equal(trades, result);
+        Assert.Equal(result.Count, result.Distinct().Count());
+        await _repo.Received(1).GetDistinctTradesAsync();
+    }
 }

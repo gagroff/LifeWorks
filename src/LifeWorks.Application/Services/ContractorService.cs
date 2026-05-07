@@ -14,6 +14,12 @@ public class ContractorService(IContractorRepository repository) : IContractorSe
     public Task<int> GetLinkedImprovementCountAsync(Guid contractorId) =>
         repository.GetLinkedImprovementCountAsync(contractorId);
 
+    public Task<List<Contractor>> GetFavoritesAsync() =>
+        repository.GetFavoritesAsync();
+
+    public Task<List<string>> GetDistinctTradesAsync() =>
+        repository.GetDistinctTradesAsync();
+
     public async Task AddAsync(Contractor contractor)
     {
         contractor.Id = Guid.NewGuid();

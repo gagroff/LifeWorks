@@ -59,3 +59,7 @@ Blazor Pages → Application Services → Repository Interfaces → Infrastructu
 ## Build Configuration
 
 `Directory.Build.props` enables warnings-as-errors and latest Roslyn analysis across all projects. C# 14 with nullable enabled and implicit usings.
+
+## Implementation Plans
+
+All implementation plans live in `docs/ImplementationPlans/` and follow the naming convention `Plan[Letter]-[FeatureName].md` (e.g. `PlanA-Dashboard.md`). When creating new plans, always write them to this folder — not to the Claude-managed plans folder.
