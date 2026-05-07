@@ -52,6 +52,28 @@ else
                               Class="mb-3" />
             </MudItem>
 
+            <MudItem xs="12" md="6">
+                <MudAutocomplete T="string"
+                                 @bind-Value="_model.Trade"
+                                 Label="Trade / Specialty"
+                                 SearchFunc="SearchTradesAsync"
+                                 CoerceText="true"
+                                 For="() => _model.Trade"
+                                 Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudField Label="Rating" Class="mb-3">
+                    <MudRating @bind-SelectedValue="_ratingValue" MaxValue="5" />
+                </MudField>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudSwitch @bind-Value="_model.IsFavorite"
+                           Label="Mark as Trusted Vendor"
+                           Color="Color.Warning"
+                           Class="mb-3" />
+            </MudItem>
+
             <MudItem xs="12">
                 <MudTextField @bind-Value="_model.Notes"
                               Label="Notes"
@@ -82,11 +104,14 @@ else
     private Contractor _model = new();
     private bool _loading = true;
     private bool _isEditMode;
+    private List<string> _trades = [];
+    private int _ratingValue;
 
     protected override async Task OnParametersSetAsync()
     {
         _loading = true;
         _isEditMode = Id.HasValue;
+        _trades = await ContractorService.GetDistinctTradesAsync();
 
         if (_isEditMode)
         {
@@ -99,17 +124,29 @@ else
             }
 
             _model = existing;
+            _ratingValue = existing.Rating ?? 0;
         }
         else
         {
             _model = new Contractor();
+            _ratingValue = 0;
         }
 
         _loading = false;
     }
 
+    private Task<IEnumerable<string>> SearchTradesAsync(string? value, CancellationToken _)
+    {
+        var results = string.IsNullOrWhiteSpace(value)
+            ? _trades
+            : _trades.Where(t => t.Contains(value, StringComparison.OrdinalIgnoreCase)).ToList();
+        return Task.FromResult<IEnumerable<string>>(results);
+    }
+
     private async Task SaveAsync()
     {
+        _model.Rating = _ratingValue > 0 ? _ratingValue : null;
+
         if (_isEditMode)
         {
             await ContractorService.UpdateAsync(_model);

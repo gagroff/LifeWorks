@@ -19,4 +19,15 @@ public class ContractorRepository(AppDbContext context) : RepositoryBase<Contrac
 
     public async Task<int> GetLinkedImprovementCountAsync(Guid contractorId) =>
         await Context.HomeImprovements.CountAsync(h => h.ContractorId == contractorId);
+
+    public async Task<List<Contractor>> GetFavoritesAsync() =>
+        await Context.Contractors.Where(c => c.IsFavorite).OrderBy(c => c.Name).ToListAsync();
+
+    public async Task<List<string>> GetDistinctTradesAsync() =>
+        await Context.Contractors
+            .Where(c => c.Trade != null)
+            .Select(c => c.Trade!)
+            .Distinct()
+            .OrderBy(t => t)
+            .ToListAsync();
 }

@@ -13,6 +13,10 @@ public class Contractor
     public string? Email { get; set; }
     public string? Website { get; set; }
     public string? Notes { get; set; }
+    [MaxLength(100)]
+    public string? Trade { get; set; }
+    public int? Rating { get; set; }
+    public bool IsFavorite { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

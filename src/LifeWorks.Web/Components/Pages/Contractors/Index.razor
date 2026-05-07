@@ -20,6 +20,12 @@
                   Clearable="true"
                   Class="w-100" />
 
+    <MudTooltip Text="@(_favoritesOnly ? "Show all" : "Show favorites only")">
+        <MudIconButton Icon="@(_favoritesOnly ? Icons.Material.Filled.Star : Icons.Material.Outlined.Star)"
+                       Color="Color.Warning"
+                       OnClick="ToggleFavoritesAsync" />
+    </MudTooltip>
+
     <MudButton Variant="Variant.Filled"
                Color="Color.Primary"
                StartIcon="@Icons.Material.Filled.Add"
@@ -42,14 +48,35 @@ else
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Company</MudTh>
+            <MudTh>Trade</MudTh>
+            <MudTh>Rating</MudTh>
             <MudTh>Phone</MudTh>
             <MudTh>Email</MudTh>
             <MudTh># Improvements</MudTh>
             <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Contractor.Name</MudTd>
+            <MudTd>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    @if (context.Contractor.IsFavorite)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Size="Size.Small" />
+                    }
+                    <MudLink Href="@($"/contractors/{context.Contractor.Id}")">@context.Contractor.Name</MudLink>
+                </MudStack>
+            </MudTd>
             <MudTd>@(string.IsNullOrWhiteSpace(context.Contractor.CompanyName) ? "-" : context.Contractor.CompanyName)</MudTd>
+            <MudTd>@(string.IsNullOrWhiteSpace(context.Contractor.Trade) ? "-" : context.Contractor.Trade)</MudTd>
+            <MudTd>
+                @if (context.Contractor.Rating.HasValue)
+                {
+                    <MudRating ReadOnly="true" SelectedValue="context.Contractor.Rating.Value" MaxValue="5" Size="Size.Small" />
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">-</MudText>
+                }
+            </MudTd>
             <MudTd>@(string.IsNullOrWhiteSpace(context.Contractor.Phone) ? "-" : context.Contractor.Phone)</MudTd>
             <MudTd>@(string.IsNullOrWhiteSpace(context.Contractor.Email) ? "-" : context.Contractor.Email)</MudTd>
             <MudTd>@context.LinkedImprovementCount</MudTd>
@@ -80,6 +107,7 @@ else
     private List<ContractorListRow> _rows = [];
     private string? _searchTerm;
     private bool _loading = true;
+    private bool _favoritesOnly;
     private bool _deleteDialogVisible;
     private ContractorListRow? _pendingDeleteRow;
     private string _deleteMessage = string.Empty;
@@ -101,11 +129,19 @@ else
         await LoadContractorsAsync(_searchTerm);
     }
 
+    private async Task ToggleFavoritesAsync()
+    {
+        _favoritesOnly = !_favoritesOnly;
+        await LoadContractorsAsync(_searchTerm);
+    }
+
     private async Task LoadContractorsAsync(string? searchTerm)
     {
         _loading = true;
 
-        var contractors = await ContractorService.GetAllAsync(searchTerm);
+        var contractors = _favoritesOnly
+            ? await ContractorService.GetFavoritesAsync()
+            : await ContractorService.GetAllAsync(searchTerm);
         var rowTasks = contractors.Select(async contractor =>
         {
             var linkedCount = await ContractorService.GetLinkedImprovementCountAsync(contractor.Id);

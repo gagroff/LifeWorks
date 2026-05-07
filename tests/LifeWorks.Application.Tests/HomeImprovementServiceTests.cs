@@ -160,4 +160,23 @@ public class HomeImprovementServiceTests
 
         Assert.Empty(result);
     }
+
+    [Fact]
+    public async Task GetAll_FilteredByContractorId_ReturnsMatchingImprovements()
+    {
+        var contractorId = Guid.NewGuid();
+        var filter = new HomeImprovementFilter { ContractorId = contractorId };
+        var expected = new List<HomeImprovement>
+        {
+            new() { ContractorId = contractorId, Title = "Rewire basement" },
+            new() { ContractorId = contractorId, Title = "Install panel" }
+        };
+        _repo.GetFilteredAsync(Arg.Is<HomeImprovementFilter>(f => f.ContractorId == contractorId))
+             .Returns(expected);
+
+        var result = await _sut.GetAllAsync(filter);
+
+        Assert.Equal(expected, result);
+        Assert.All(result, i => Assert.Equal(contractorId, i.ContractorId));
+    }
 }

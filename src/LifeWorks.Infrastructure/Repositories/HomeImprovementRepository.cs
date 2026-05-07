@@ -77,6 +77,9 @@ public class HomeImprovementRepository(AppDbContext context) : RepositoryBase<Ho
         if (filter.CategoryId.HasValue)
             query = query.Where(h => h.CategoryId == filter.CategoryId);
 
+        if (filter.ContractorId.HasValue)
+            query = query.Where(h => h.ContractorId == filter.ContractorId);
+
         if (filter.DateFrom.HasValue)
             query = query.Where(h => h.DateCompleted >= filter.DateFrom);
 
