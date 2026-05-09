@@ -1,0 +1,190 @@
+@page "/assets"
+@inject IAssetService AssetService
+@inject IPropertyService PropertyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Assets</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Assets</MudText>
+
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudGrid>
+        <MudItem xs="12" sm="8" md="4">
+            <MudSelect T="Guid?"
+                       Label="Property"
+                       Value="_selectedPropertyId"
+                       ValueChanged="OnPropertyChanged"
+                       Clearable="true">
+                @foreach (var property in _properties)
+                {
+                    <MudSelectItem T="Guid?" Value="property.Id">@property.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Class="mb-2">
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Href="/assets/new">
+        New Asset
+    </MudButton>
+</MudStack>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_assets.Count == 0)
+{
+    <MudText>No assets found.</MudText>
+}
+else
+{
+    <MudDataGrid Items="_assets" SortMode="SortMode.Single" Hover="true" Striped="true">
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="Name" />
+            <PropertyColumn Property="x => x.Category" Title="Category" />
+            <TemplateColumn Title="Make / Model">
+                <CellTemplate>
+                    @FormatMakeModel(context.Item)
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Purchase Date">
+                <CellTemplate>
+                    @(context.Item.PurchaseDate.HasValue ? context.Item.PurchaseDate.Value.ToString("MM/dd/yyyy") : "-")
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Warranty Expiration">
+                <CellTemplate>
+                    @if (context.Item.WarrantyExpiration.HasValue)
+                    {
+                        var color = GetWarrantyColor(context.Item.WarrantyExpiration.Value);
+                        <MudChip T="string" Color="@color" Variant="Variant.Outlined" Size="Size.Small">
+                            @context.Item.WarrantyExpiration.Value.ToString("MM/dd/yyyy")
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">-</MudText>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Estimated Value">
+                <CellTemplate>
+                    @(context.Item.EstimatedValue.HasValue ? context.Item.EstimatedValue.Value.ToString("C") : "-")
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Actions" Sortable="false">
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Color="Color.Secondary"
+                                   OnClick="() => EditAsset(context.Item.Id)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   OnClick="() => DeleteAssetAsync(context.Item)" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+
+<MudMessageBox Title="Delete Asset"
+               Message="@_deleteMessage"
+               YesText="Delete"
+               CancelText="Cancel"
+               @bind-Visible="_deleteDialogVisible"
+               OnYes="ConfirmDeleteAsync"
+               OnCancel="CancelDelete" />
+
+@code {
+    private List<Asset> _assets = [];
+    private List<Property> _properties = [];
+    private Guid? _selectedPropertyId;
+    private bool _loading = true;
+
+    private bool _deleteDialogVisible;
+    private Asset? _pendingDeleteAsset;
+    private string _deleteMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _properties = await PropertyService.GetAllAsync();
+        await LoadAssetsAsync();
+    }
+
+    private async Task OnPropertyChanged(Guid? value)
+    {
+        _selectedPropertyId = value;
+        await LoadAssetsAsync();
+    }
+
+    private async Task LoadAssetsAsync()
+    {
+        _loading = true;
+        _assets = _selectedPropertyId.HasValue
+            ? await AssetService.GetAllByPropertyAsync(_selectedPropertyId.Value)
+            : await AssetService.GetAllAsync();
+        _loading = false;
+    }
+
+    private static string FormatMakeModel(Asset asset)
+    {
+        if (string.IsNullOrWhiteSpace(asset.Make) && string.IsNullOrWhiteSpace(asset.Model))
+            return "-";
+
+        if (string.IsNullOrWhiteSpace(asset.Make))
+            return asset.Model!;
+
+        if (string.IsNullOrWhiteSpace(asset.Model))
+            return asset.Make;
+
+        return $"{asset.Make} / {asset.Model}";
+    }
+
+    private static Color GetWarrantyColor(DateOnly expiration)
+    {
+        var days = expiration.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+        if (days < 30)
+            return Color.Error;
+
+        if (days < 90)
+            return Color.Warning;
+
+        return Color.Success;
+    }
+
+    private void EditAsset(Guid assetId)
+    {
+        Navigation.NavigateTo($"/assets/{assetId}/edit");
+    }
+
+    private Task DeleteAssetAsync(Asset asset)
+    {
+        _pendingDeleteAsset = asset;
+        _deleteMessage = $"Delete '{asset.Name}'? This cannot be undone.";
+        _deleteDialogVisible = true;
+        return Task.CompletedTask;
+    }
+
+    private void CancelDelete()
+    {
+        _deleteDialogVisible = false;
+        _pendingDeleteAsset = null;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_pendingDeleteAsset is null)
+            return;
+
+        await AssetService.DeleteAsync(_pendingDeleteAsset.Id);
+        _deleteDialogVisible = false;
+        _pendingDeleteAsset = null;
+        await LoadAssetsAsync();
+        Snackbar.Add("Asset deleted", Severity.Success);
+    }
+}

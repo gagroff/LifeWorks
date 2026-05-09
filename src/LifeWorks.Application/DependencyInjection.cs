@@ -7,6 +7,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        services.AddScoped<IAssetService, AssetService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IContractorService, ContractorService>();
         services.AddScoped<IHomeImprovementService, HomeImprovementService>();

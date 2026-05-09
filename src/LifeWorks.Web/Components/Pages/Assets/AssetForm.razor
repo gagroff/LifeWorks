@@ -1,0 +1,193 @@
+@page "/assets/new"
+@page "/assets/{Id:guid}/edit"
+@inject IAssetService AssetService
+@inject IPropertyService PropertyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>@(_isEditMode ? "Edit Asset" : "New Asset")</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">@(_isEditMode ? "Edit Asset" : "New Asset")</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Name"
+                              Label="Name"
+                              Required="true"
+                              For="() => _model.Name"
+                              Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudSelect T="Guid"
+                           Label="Property"
+                           @bind-Value="_model.PropertyId"
+                           Required="true"
+                           For="() => _model.PropertyId"
+                           Class="mb-3">
+                    @foreach (var property in _properties)
+                    {
+                        <MudSelectItem T="Guid" Value="property.Id">@property.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudSelect T="string"
+                           Label="Category"
+                           @bind-Value="_model.Category"
+                           Clearable="true"
+                           Class="mb-3">
+                    @foreach (var category in _categories)
+                    {
+                        <MudSelectItem T="string" Value="category">@category</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Make"
+                              Label="Make"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Model"
+                              Label="Model"
+                              Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.SerialNumber"
+                              Label="Serial Number"
+                              Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudDatePicker Label="Purchase Date"
+                               Date="_purchaseDate"
+                               DateChanged="date => _purchaseDate = date"
+                               DateFormat="MM/dd/yyyy"
+                               Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudDatePicker Label="Warranty Expiration"
+                               Date="_warrantyExpiration"
+                               DateChanged="date => _warrantyExpiration = date"
+                               DateFormat="MM/dd/yyyy"
+                               Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudNumericField T="decimal?"
+                                 @bind-Value="_model.PurchasePrice"
+                                 Label="Purchase Price"
+                                 Adornment="Adornment.Start"
+                                 AdornmentText="$"
+                                 Format="F2"
+                                 Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudNumericField T="decimal?"
+                                 @bind-Value="_model.EstimatedValue"
+                                 Label="Estimated Value"
+                                 Adornment="Adornment.Start"
+                                 AdornmentText="$"
+                                 Format="F2"
+                                 Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_model.Notes"
+                              Label="Notes"
+                              Lines="4"
+                              Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Row="true" Spacing="2" Class="mt-4">
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Save
+            </MudButton>
+            <MudButton Variant="Variant.Text" OnClick="BackToList">Cancel</MudButton>
+        </MudStack>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private Asset _model = new();
+    private List<Property> _properties = [];
+    private List<string> _categories = [];
+
+    private DateTime? _purchaseDate;
+    private DateTime? _warrantyExpiration;
+    private bool _loading = true;
+    private bool _isEditMode;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _isEditMode = Id.HasValue;
+
+        _properties = await PropertyService.GetAllAsync();
+        _categories = await AssetService.GetDistinctCategoriesAsync();
+
+        if (_isEditMode)
+        {
+            var existing = await AssetService.GetByIdAsync(Id!.Value);
+            if (existing is null)
+            {
+                Snackbar.Add("Asset not found.", Severity.Error);
+                Navigation.NavigateTo("/assets");
+                return;
+            }
+
+            _model = existing;
+            _purchaseDate = existing.PurchaseDate?.ToDateTime(TimeOnly.MinValue);
+            _warrantyExpiration = existing.WarrantyExpiration?.ToDateTime(TimeOnly.MinValue);
+        }
+        else
+        {
+            _model = new Asset();
+            _purchaseDate = null;
+            _warrantyExpiration = null;
+        }
+
+        _loading = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        _model.PurchaseDate = _purchaseDate.HasValue ? DateOnly.FromDateTime(_purchaseDate.Value) : null;
+        _model.WarrantyExpiration = _warrantyExpiration.HasValue ? DateOnly.FromDateTime(_warrantyExpiration.Value) : null;
+
+        if (_isEditMode)
+        {
+            await AssetService.UpdateAsync(_model);
+            Snackbar.Add("Asset updated", Severity.Success);
+        }
+        else
+        {
+            await AssetService.AddAsync(_model);
+            Snackbar.Add("Asset added", Severity.Success);
+        }
+
+        Navigation.NavigateTo("/assets");
+    }
+
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/assets");
+    }
+}
