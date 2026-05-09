@@ -9,6 +9,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Contractor> Contractors => Set<Contractor>();
     public DbSet<HomeImprovement> HomeImprovements => Set<HomeImprovement>();
+    public DbSet<Asset> Assets => Set<Asset>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -72,6 +73,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(x => x.HomeImprovementId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+            modelBuilder.Entity<Asset>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                e.Property(x => x.Category).HasMaxLength(100);
+                e.Property(x => x.Make).HasMaxLength(200);
+                e.Property(x => x.Model).HasMaxLength(200);
+                e.Property(x => x.SerialNumber).HasMaxLength(200);
+                e.Property(x => x.PurchasePrice).HasPrecision(18, 2);
+                e.Property(x => x.EstimatedValue).HasPrecision(18, 2);
+
+                e.HasOne(x => x.Property)
+                .WithMany(x => x.Assets)
+                .HasForeignKey(x => x.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
 
         SeedData(modelBuilder);
     }

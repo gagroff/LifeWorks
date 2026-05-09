@@ -1,5 +1,6 @@
 @page "/"
 @inject IHomeImprovementService HomeImprovementService
+@inject IAssetService AssetService
 
 <PageTitle>LifeWorks</PageTitle>
 
@@ -37,7 +38,7 @@ else
         <MudItem xs="12" sm="4">
             <MudPaper Class="pa-4 d-flex flex-column align-center" Elevation="2">
                 <MudIcon Icon="@Icons.Material.Filled.Shield" Color="Color.Warning" Size="Size.Large" Class="mb-1" />
-                <MudText Typo="Typo.h4">@_expiringWarranties.Count</MudText>
+                <MudText Typo="Typo.h4">@_expiringWarrantyItems.Count</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">Warranties Expiring (90 days)</MudText>
             </MudPaper>
         </MudItem>
@@ -83,7 +84,7 @@ else
         @* ── Warranty Alerts ── *@
         <MudItem xs="12" md="6">
             <MudText Typo="Typo.h6" Class="mb-2">Warranty Alerts</MudText>
-            @if (_expiringWarranties.Count == 0)
+            @if (_expiringWarrantyItems.Count == 0)
             {
                 <MudPaper Class="pa-3" Elevation="1">
                     <MudText Typo="Typo.body2" Color="Color.Secondary">No warranties expiring in the next 90 days.</MudText>
@@ -92,16 +93,19 @@ else
             else
             {
                 <MudList T="string" Dense="true">
-                    @foreach (var item in _expiringWarranties)
+                    @foreach (var item in _expiringWarrantyItems)
                     {
-                        var daysLeft = item.WarrantyExpiration!.Value.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+                        var daysLeft = item.WarrantyExpiration.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
                         var chipColor = daysLeft < 0 ? Color.Error : daysLeft <= 30 ? Color.Warning : Color.Success;
                         var label = daysLeft < 0 ? "Expired" : daysLeft == 0 ? "Today" : $"{daysLeft}d left";
                         <MudListItem>
                             <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-                                <MudLink Href="@($"/improvements/{item.Id}")">@item.Title</MudLink>
                                 <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Property?.Name</MudText>
+                                    <MudLink Href="@item.LinkHref">@item.Title</MudLink>
+                                    <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined" Size="Size.Small">@item.Source</MudChip>
+                                </MudStack>
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@item.PropertyName</MudText>
                                     <MudChip T="string" Color="@chipColor" Size="Size.Small">@label</MudChip>
                                 </MudStack>
                             </MudStack>
@@ -152,7 +156,9 @@ else
 
     private List<(string PropertyName, decimal TotalCost)> _costByProperty = [];
     private List<(string CategoryName, decimal TotalCost)> _costByCategory = [];
-    private List<HomeImprovement> _expiringWarranties = [];
+    private List<HomeImprovement> _expiringImprovementWarranties = [];
+    private List<Asset> _expiringAssetWarranties = [];
+    private List<WarrantyAlertItem> _expiringWarrantyItems = [];
     private List<HomeImprovement> _recentImprovements = [];
 
     private List<ChartSeries<double>> _categorySeries = [];
@@ -166,7 +172,28 @@ else
 
         _costByProperty = await HomeImprovementService.GetCostByPropertyAsync();
         _costByCategory = await HomeImprovementService.GetCostByCategoryAsync();
-        _expiringWarranties = await HomeImprovementService.GetExpiringWarrantiesAsync(90);
+        _expiringImprovementWarranties = await HomeImprovementService.GetExpiringWarrantiesAsync(90);
+        _expiringAssetWarranties = await AssetService.GetExpiringWarrantiesAsync(90);
+        _expiringWarrantyItems =
+        [
+            .. _expiringImprovementWarranties
+                .Where(i => i.WarrantyExpiration.HasValue)
+                .Select(i => new WarrantyAlertItem(
+                    i.WarrantyExpiration!.Value,
+                    i.Title,
+                    i.Property?.Name ?? "-",
+                    "Improvement",
+                    $"/improvements/{i.Id}")),
+            .. _expiringAssetWarranties
+                .Where(a => a.WarrantyExpiration.HasValue)
+                .Select(a => new WarrantyAlertItem(
+                    a.WarrantyExpiration!.Value,
+                    a.Name,
+                    a.Property?.Name ?? "-",
+                    "Asset",
+                    $"/assets/{a.Id}/edit"))
+        ];
+        _expiringWarrantyItems = [.. _expiringWarrantyItems.OrderBy(x => x.WarrantyExpiration)];
         _recentImprovements = await HomeImprovementService.GetRecentAsync(5);
 
         _categoryLabels = [.. _costByCategory.Select(x => x.CategoryName)];
@@ -181,4 +208,11 @@ else
 
         _loading = false;
     }
+
+    private sealed record WarrantyAlertItem(
+        DateOnly WarrantyExpiration,
+        string Title,
+        string PropertyName,
+        string Source,
+        string LinkHref);
 }

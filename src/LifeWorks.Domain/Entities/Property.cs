@@ -12,4 +12,5 @@ public class Property
     public DateTime UpdatedAt { get; set; }
 
     public ICollection<HomeImprovement> HomeImprovements { get; set; } = [];
+    public ICollection<Asset> Assets { get; set; } = [];
 }
