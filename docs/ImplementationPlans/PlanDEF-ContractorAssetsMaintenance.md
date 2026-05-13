@@ -245,7 +245,7 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
 
 ## Phase F1 — Domain Layer
 
-- [ ] **Task F1.1** — Create `MaintenanceTask` entity
+- [x] **Task F1.1** — Create `MaintenanceTask` entity
   - **File:** `src/LifeWorks.Domain/Entities/MaintenanceTask.cs` (new)
   ```csharp
   public class MaintenanceTask
@@ -265,13 +265,13 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
   }
   ```
 
-- [ ] **Task F1.2** — Create `RecurrenceInterval` enum
+- [x] **Task F1.2** — Create `RecurrenceInterval` enum
   - **File:** `src/LifeWorks.Domain/Enums/RecurrenceInterval.cs` (new)
   ```csharp
   public enum RecurrenceInterval { Days, Weeks, Months, Years }
   ```
 
-- [ ] **Task F1.3** — Create `MaintenanceLog` entity
+- [x] **Task F1.3** — Create `MaintenanceLog` entity
   - **File:** `src/LifeWorks.Domain/Entities/MaintenanceLog.cs` (new)
   ```csharp
   public class MaintenanceLog
@@ -290,7 +290,7 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
 
 ## Phase F2 — Infrastructure Layer
 
-- [ ] **Task F2.1** — Register entities in `AppDbContext`
+- [x] **Task F2.1** — Register entities in `AppDbContext`
   - **File:** `src/LifeWorks.Infrastructure/Data/AppDbContext.cs`
   - Add: `public DbSet<MaintenanceTask> MaintenanceTasks => Set<MaintenanceTask>();`
   - Add: `public DbSet<MaintenanceLog> MaintenanceLogs => Set<MaintenanceLog>();`
@@ -298,14 +298,14 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
   - Configure FK: `MaintenanceLog → MaintenanceTask` (OnDelete: Cascade)
   - Configure string lengths and decimal precision
 
-- [ ] **Task F2.2** — Add EF Core migration
+- [x] **Task F2.2** — Add EF Core migration
   - Run: `dotnet ef migrations add AddMaintenanceScheduler --project src/LifeWorks.Infrastructure --startup-project src/LifeWorks.Web`
 
 ---
 
 ## Phase F3 — Application Layer
 
-- [ ] **Task F3.1** — Create `IMaintenanceTaskRepository`
+- [x] **Task F3.1** — Create `IMaintenanceTaskRepository`
   - **File:** `src/LifeWorks.Application/Repositories/IMaintenanceTaskRepository.cs` (new)
   ```csharp
   public interface IMaintenanceTaskRepository : IRepository<MaintenanceTask>
@@ -316,7 +316,7 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
   }
   ```
 
-- [ ] **Task F3.2** — Create `IMaintenanceLogRepository`
+- [x] **Task F3.2** — Create `IMaintenanceLogRepository`
   - **File:** `src/LifeWorks.Application/Repositories/IMaintenanceLogRepository.cs` (new)
   ```csharp
   public interface IMaintenanceLogRepository : IRepository<MaintenanceLog>
@@ -325,16 +325,16 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
   }
   ```
 
-- [ ] **Task F3.3** — Implement `MaintenanceTaskRepository`
+- [x] **Task F3.3** — Implement `MaintenanceTaskRepository`
   - **File:** `src/LifeWorks.Infrastructure/Repositories/MaintenanceTaskRepository.cs` (new)
   - `GetOverdueOrUpcomingAsync`: compute `NextDueDate` from `LastCompletedDate + Interval` and return tasks due within `withinDays` days (or already overdue)
   - `GetWithLogsAsync`: include `Logs` navigation, ordered by CompletedDate descending
 
-- [ ] **Task F3.4** — Implement `MaintenanceLogRepository`
+- [x] **Task F3.4** — Implement `MaintenanceLogRepository`
   - **File:** `src/LifeWorks.Infrastructure/Repositories/MaintenanceLogRepository.cs` (new)
   - `GetByTaskAsync`: return logs for a task ordered by CompletedDate descending
 
-- [ ] **Task F3.5** — Create `IMaintenanceService` and `MaintenanceService`
+- [x] **Task F3.5** — Create `IMaintenanceService` and `MaintenanceService`
   - **File:** `src/LifeWorks.Application/Services/IMaintenanceService.cs` (new)
   - Methods:
     - `Task<List<MaintenanceTask>> GetAllTasksAsync(Guid? propertyId = null)`
@@ -348,7 +348,7 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
   - **File:** `src/LifeWorks.Application/Services/MaintenanceService.cs` (new)
   - `LogCompletionAsync`: creates a `MaintenanceLog`, updates `task.LastCompletedDate`, saves both; set timestamps
 
-- [ ] **Task F3.6** — Register in DI
+- [x] **Task F3.6** — Register in DI
   - **File:** `src/LifeWorks.Infrastructure/DependencyInjection.cs`
   - Add `IMaintenanceTaskRepository`, `IMaintenanceLogRepository` → concrete implementations
   - **File:** `src/LifeWorks.Application/DependencyInjection.cs`
@@ -358,7 +358,7 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
 
 ## Phase F4 — Web Layer
 
-- [ ] **Task F4.1** — Maintenance task list page
+- [x] **Task F4.1** — Maintenance task list page
   - **File:** `src/LifeWorks.Web/Components/Pages/Maintenance/Index.razor` (new)
   - Route: `/maintenance`
   - Property filter (MudSelect)
@@ -367,30 +367,30 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
   - "Log Completion" action button per row (opens inline dialog)
   - Add/Edit/Delete task actions
 
-- [ ] **Task F4.2** — Maintenance task form (add/edit)
+- [x] **Task F4.2** — Maintenance task form (add/edit)
   - **File:** `src/LifeWorks.Web/Components/Pages/Maintenance/MaintenanceTaskForm.razor` (new)
   - Routes: `/maintenance/new`, `/maintenance/{Id:guid}/edit`
   - Fields: Title (required), Property (required MudSelect), Interval value (MudNumericField) + Interval unit (MudSelect Days/Weeks/Months/Years), Notes, IsActive toggle
   - 2-column responsive grid
 
-- [ ] **Task F4.3** — Log completion dialog
+- [x] **Task F4.3** — Log completion dialog
   - Inline `MudDialog` on the Index page
   - Fields: Completed Date (MudDatePicker, defaults to today), Cost (optional MudNumericField), Notes (optional MudTextField)
   - On submit: calls `MaintenanceService.LogCompletionAsync()`, reloads grid
 
-- [ ] **Task F4.4** — Task detail / log history page
+- [x] **Task F4.4** — Task detail / log history page
   - **File:** `src/LifeWorks.Web/Components/Pages/Maintenance/MaintenanceDetail.razor` (new)
   - Route: `/maintenance/{Id:guid}`
   - Shows task info card + full completion log history (date, cost, notes) with delete per entry
 
-- [ ] **Task F4.5** — Dashboard widget for upcoming/overdue maintenance
+- [x] **Task F4.5** — Dashboard widget for upcoming/overdue maintenance
   - **File:** `src/LifeWorks.Web/Components/Pages/Home.razor`
   - Add "Maintenance Due" section below existing widgets
   - Call `MaintenanceService.GetOverdueOrUpcomingAsync(30)`
   - Show: task title, property, next due date, status chip
   - Link each row to `/maintenance/{id}`
 
-- [ ] **Task F4.6** — Add Maintenance to NavMenu
+- [x] **Task F4.6** — Add Maintenance to NavMenu
   - **File:** `src/LifeWorks.Web/Components/Layout/NavMenu.razor`
   - Add "Maintenance" link under the "Property Management" group
 
@@ -398,7 +398,7 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
 
 ## Phase F5 — Tests
 
-- [ ] **Task F5.1** — Unit tests for `MaintenanceService`
+- [x] **Task F5.1** — Unit tests for `MaintenanceService`
   - **File:** `tests/LifeWorks.Application.Tests/MaintenanceServiceTests.cs` (new)
   - Test: `AddTask_SetsTimestamps`
   - Test: `LogCompletion_UpdatesLastCompletedDate`
@@ -410,9 +410,9 @@ LifeWorks currently tracks one-time home improvement projects but has no concept
 
 ## Verification
 
-- [ ] `dotnet build` — zero errors/warnings
-- [ ] `dotnet ef database update` — migration applies cleanly
-- [ ] `dotnet test` — all tests pass
+- [x] `dotnet build` — zero errors/warnings
+- [x] `dotnet ef database update` — migration applies cleanly
+- [x] `dotnet test` — all tests pass
 - [ ] Navigate to `/maintenance` — page loads with empty state
 - [ ] Create a maintenance task (e.g. "Change HVAC filter, every 90 days") — saves correctly
 - [ ] Log a completion — LastCompletedDate updates, log entry appears in history
