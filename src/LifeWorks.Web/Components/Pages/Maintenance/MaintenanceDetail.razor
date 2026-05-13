@@ -1,0 +1,176 @@
+@page "/maintenance/{Id:guid}"
+@inject IMaintenanceService MaintenanceService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>@(_task?.Title ?? "Maintenance Task")</PageTitle>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_task is null)
+{
+    <MudText>Task not found.</MudText>
+}
+else
+{
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-4">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       OnClick="@(() => Navigation.NavigateTo("/maintenance"))" />
+        <MudText Typo="Typo.h4">@_task.Title</MudText>
+        @{
+            var (chipColor, label) = GetStatus(_task);
+        }
+        <MudChip T="string" Color="@chipColor" Size="Size.Small">@label</MudChip>
+        <MudSpacer />
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Filled.Edit"
+                   Href="@($"/maintenance/{Id}/edit")">
+            Edit
+        </MudButton>
+    </MudStack>
+
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" md="6">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Class="mb-3">Task Details</MudText>
+                    <MudStack Spacing="1">
+                        <MudText><strong>Property:</strong> @_task.Property.Name</MudText>
+                        <MudText><strong>Interval:</strong> Every @_task.IntervalValue @_task.Interval.ToString().ToLowerInvariant()</MudText>
+                        <MudText><strong>Active:</strong> @(_task.IsActive ? "Yes" : "No")</MudText>
+                        <MudText>
+                            <strong>Last Completed:</strong>
+                            @(_task.LastCompletedDate.HasValue ? _task.LastCompletedDate.Value.ToString("MM/dd/yyyy") : "Never")
+                        </MudText>
+                        <MudText><strong>Next Due:</strong> @ComputeNextDueDate(_task).ToString("MM/dd/yyyy")</MudText>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        @if (!string.IsNullOrWhiteSpace(_task.Notes))
+        {
+            <MudItem xs="12" md="6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" Class="mb-3">Notes</MudText>
+                        <MudText Style="white-space: pre-wrap">@_task.Notes</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+
+    <MudText Typo="Typo.h5" Class="mb-3">
+        Completion History
+        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Class="ml-2">@_logs.Count</MudChip>
+    </MudText>
+
+    @if (_logs.Count == 0)
+    {
+        <MudText Color="Color.Secondary">No completions logged yet.</MudText>
+    }
+    else
+    {
+        <MudTable Items="_logs" Hover="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Completed Date</MudTh>
+                <MudTh>Cost</MudTh>
+                <MudTh>Notes</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.CompletedDate.ToString("MM/dd/yyyy")</MudTd>
+                <MudTd>@(context.Cost.HasValue ? context.Cost.Value.ToString("C") : "-")</MudTd>
+                <MudTd>@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   OnClick="() => DeleteLogAsync(context)" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+}
+
+<MudMessageBox Title="Delete Log Entry"
+               Message="Delete this completion entry?"
+               YesText="Delete"
+               CancelText="Cancel"
+               @bind-Visible="_deleteDialogVisible"
+               OnYes="ConfirmDeleteLogAsync"
+               OnCancel="CancelDelete" />
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private MaintenanceTask? _task;
+    private List<MaintenanceLog> _logs = [];
+    private bool _loading = true;
+
+    private bool _deleteDialogVisible;
+    private MaintenanceLog? _pendingDeleteLog;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _task = await MaintenanceService.GetTaskWithLogsAsync(Id);
+        _logs = _task?.Logs.OrderByDescending(l => l.CompletedDate).ToList() ?? [];
+        _loading = false;
+    }
+
+    private Task DeleteLogAsync(MaintenanceLog log)
+    {
+        _pendingDeleteLog = log;
+        _deleteDialogVisible = true;
+        return Task.CompletedTask;
+    }
+
+    private void CancelDelete()
+    {
+        _deleteDialogVisible = false;
+        _pendingDeleteLog = null;
+    }
+
+    private async Task ConfirmDeleteLogAsync()
+    {
+        if (_pendingDeleteLog is null)
+            return;
+
+        await MaintenanceService.DeleteLogAsync(_pendingDeleteLog.Id);
+        _deleteDialogVisible = false;
+        _pendingDeleteLog = null;
+        Snackbar.Add("Log entry deleted", Severity.Success);
+
+        _task = await MaintenanceService.GetTaskWithLogsAsync(Id);
+        _logs = _task?.Logs.OrderByDescending(l => l.CompletedDate).ToList() ?? [];
+    }
+
+    private static DateOnly ComputeNextDueDate(MaintenanceTask task)
+    {
+        var anchor = task.LastCompletedDate ?? DateOnly.FromDateTime(task.CreatedAt);
+        return task.Interval switch
+        {
+            RecurrenceInterval.Days => anchor.AddDays(task.IntervalValue),
+            RecurrenceInterval.Weeks => anchor.AddDays(task.IntervalValue * 7),
+            RecurrenceInterval.Months => anchor.AddMonths(task.IntervalValue),
+            RecurrenceInterval.Years => anchor.AddYears(task.IntervalValue),
+            _ => anchor
+        };
+    }
+
+    private static (Color Color, string Label) GetStatus(MaintenanceTask task)
+    {
+        var next = ComputeNextDueDate(task);
+        var days = next.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+        if (days < 0)
+            return (Color.Error, "Overdue");
+        if (days <= 14)
+            return (Color.Warning, "Due Soon");
+        return (Color.Success, "OK");
+    }
+}

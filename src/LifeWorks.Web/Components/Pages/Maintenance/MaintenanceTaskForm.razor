@@ -1,0 +1,145 @@
+@page "/maintenance/new"
+@page "/maintenance/{Id:guid}/edit"
+@inject IMaintenanceService MaintenanceService
+@inject IPropertyService PropertyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>@(_isEditMode ? "Edit Task" : "New Task")</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">@(_isEditMode ? "Edit Maintenance Task" : "New Maintenance Task")</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Title"
+                              Label="Title"
+                              Required="true"
+                              For="() => _model.Title"
+                              Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudSelect T="Guid"
+                           Label="Property"
+                           @bind-Value="_model.PropertyId"
+                           Required="true"
+                           For="() => _model.PropertyId"
+                           Class="mb-3">
+                    @foreach (var property in _properties)
+                    {
+                        <MudSelectItem T="Guid" Value="property.Id">@property.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="3">
+                <MudNumericField T="int"
+                                 @bind-Value="_model.IntervalValue"
+                                 Label="Every"
+                                 Min="1"
+                                 Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudSelect T="RecurrenceInterval"
+                           Label="Interval"
+                           @bind-Value="_model.Interval"
+                           Class="mb-3">
+                    @foreach (var interval in Enum.GetValues<RecurrenceInterval>())
+                    {
+                        <MudSelectItem T="RecurrenceInterval" Value="interval">@interval.ToString()</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudSwitch T="bool"
+                           @bind-Value="_model.IsActive"
+                           Label="Active"
+                           Color="Color.Primary"
+                           Class="mb-3" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_model.Notes"
+                              Label="Notes"
+                              Lines="4"
+                              Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Row="true" Spacing="2" Class="mt-4">
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Save
+            </MudButton>
+            <MudButton Variant="Variant.Text" OnClick="BackToList">Cancel</MudButton>
+        </MudStack>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private MaintenanceTask _model = new() { IntervalValue = 90, Interval = RecurrenceInterval.Days, IsActive = true };
+    private List<Property> _properties = [];
+
+    private bool _loading = true;
+    private bool _isEditMode;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _isEditMode = Id.HasValue;
+
+        _properties = await PropertyService.GetAllAsync();
+
+        if (_isEditMode)
+        {
+            var existing = await MaintenanceService.GetTaskByIdAsync(Id!.Value);
+            if (existing is null)
+            {
+                Snackbar.Add("Task not found.", Severity.Error);
+                Navigation.NavigateTo("/maintenance");
+                return;
+            }
+
+            _model = existing;
+        }
+        else
+        {
+            _model = new MaintenanceTask { IntervalValue = 90, Interval = RecurrenceInterval.Days, IsActive = true };
+        }
+
+        _loading = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_isEditMode)
+        {
+            await MaintenanceService.UpdateTaskAsync(_model);
+            Snackbar.Add("Task updated", Severity.Success);
+        }
+        else
+        {
+            await MaintenanceService.AddTaskAsync(_model);
+            Snackbar.Add("Task added", Severity.Success);
+        }
+
+        Navigation.NavigateTo("/maintenance");
+    }
+
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/maintenance");
+    }
+}

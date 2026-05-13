@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<HomeImprovement> HomeImprovements => Set<HomeImprovement>();
     public DbSet<Asset> Assets => Set<Asset>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
+    public DbSet<MaintenanceTask> MaintenanceTasks => Set<MaintenanceTask>();
+    public DbSet<MaintenanceLog> MaintenanceLogs => Set<MaintenanceLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -90,6 +92,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(x => x.PropertyId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+
+        modelBuilder.Entity<MaintenanceTask>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Title).HasMaxLength(300).IsRequired();
+            e.Property(x => x.Interval).HasConversion<string>().HasMaxLength(20);
+
+            e.HasOne(x => x.Property)
+                .WithMany(x => x.MaintenanceTasks)
+                .HasForeignKey(x => x.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MaintenanceLog>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Cost).HasPrecision(18, 2);
+
+            e.HasOne(x => x.Task)
+                .WithMany(x => x.Logs)
+                .HasForeignKey(x => x.MaintenanceTaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
         SeedData(modelBuilder);
     }

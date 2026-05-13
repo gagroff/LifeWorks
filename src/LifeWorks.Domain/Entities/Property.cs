@@ -13,4 +13,5 @@ public class Property
 
     public ICollection<HomeImprovement> HomeImprovements { get; set; } = [];
     public ICollection<Asset> Assets { get; set; } = [];
+    public ICollection<MaintenanceTask> MaintenanceTasks { get; set; } = [];
 }

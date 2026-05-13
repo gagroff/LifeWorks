@@ -12,6 +12,8 @@ public static class DependencyInjection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IContractorRepository, ContractorRepository>();
         services.AddScoped<IHomeImprovementRepository, HomeImprovementRepository>();
+        services.AddScoped<IMaintenanceTaskRepository, MaintenanceTaskRepository>();
+        services.AddScoped<IMaintenanceLogRepository, MaintenanceLogRepository>();
         services.AddScoped<IPropertyRepository, PropertyRepository>();
         services.AddScoped<IAttachmentRepository, AttachmentRepository>();
         return services;

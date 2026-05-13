@@ -1,0 +1,257 @@
+@page "/maintenance"
+@inject IMaintenanceService MaintenanceService
+@inject IPropertyService PropertyService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Maintenance</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Maintenance</MudText>
+
+<MudPaper Class="pa-4 mb-4" Elevation="1">
+    <MudGrid>
+        <MudItem xs="12" sm="8" md="4">
+            <MudSelect T="Guid?"
+                       Label="Property"
+                       Value="_selectedPropertyId"
+                       ValueChanged="OnPropertyChanged"
+                       Clearable="true">
+                @foreach (var property in _properties)
+                {
+                    <MudSelectItem T="Guid?" Value="property.Id">@property.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" Class="mb-2">
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Href="/maintenance/new">
+        New Task
+    </MudButton>
+</MudStack>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+else if (_tasks.Count == 0)
+{
+    <MudText>No maintenance tasks found.</MudText>
+}
+else
+{
+    <MudDataGrid Items="_tasks" SortMode="SortMode.Single" Hover="true" Striped="true">
+        <Columns>
+            <TemplateColumn Title="Title">
+                <CellTemplate>
+                    <MudLink Href="@($"/maintenance/{context.Item.Id}")">@context.Item.Title</MudLink>
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.Property.Name" Title="Property" />
+            <TemplateColumn Title="Interval">
+                <CellTemplate>@FormatInterval(context.Item)</CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Next Due">
+                <CellTemplate>
+                    @{
+                        var next = ComputeNextDueDate(context.Item);
+                    }
+                    @next.ToString("MM/dd/yyyy")
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Last Completed">
+                <CellTemplate>
+                    @(context.Item.LastCompletedDate.HasValue
+                        ? context.Item.LastCompletedDate.Value.ToString("MM/dd/yyyy")
+                        : "-")
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Status">
+                <CellTemplate>
+                    @{
+                        var (chipColor, label) = GetStatus(context.Item);
+                    }
+                    <MudChip T="string" Color="@chipColor" Size="Size.Small">@label</MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Actions" Sortable="false">
+                <CellTemplate>
+                    <MudTooltip Text="Log Completion">
+                        <MudIconButton Icon="@Icons.Material.Filled.CheckCircle"
+                                       Color="Color.Success"
+                                       OnClick="() => OpenLogDialog(context.Item)" />
+                    </MudTooltip>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Color="Color.Secondary"
+                                   OnClick="() => EditTask(context.Item.Id)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   OnClick="() => DeleteTaskAsync(context.Item)" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+
+<MudDialog @bind-Visible="_logDialogVisible" Options="@(new DialogOptions { CloseOnEscapeKey = true })">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Log Completion — @_logTaskTitle</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudDatePicker Label="Completed Date"
+                       Date="_logCompletedDate"
+                       DateChanged="d => _logCompletedDate = d"
+                       DateFormat="MM/dd/yyyy"
+                       Class="mb-3" />
+        <MudNumericField T="decimal?"
+                         @bind-Value="_logCost"
+                         Label="Cost (optional)"
+                         Adornment="Adornment.Start"
+                         AdornmentText="$"
+                         Format="F2"
+                         Class="mb-3" />
+        <MudTextField @bind-Value="_logNotes"
+                      Label="Notes (optional)"
+                      Lines="3" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelLog">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitLogAsync">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudMessageBox Title="Delete Task"
+               Message="@_deleteMessage"
+               YesText="Delete"
+               CancelText="Cancel"
+               @bind-Visible="_deleteDialogVisible"
+               OnYes="ConfirmDeleteAsync"
+               OnCancel="CancelDelete" />
+
+@code {
+    private List<MaintenanceTask> _tasks = [];
+    private List<Property> _properties = [];
+    private Guid? _selectedPropertyId;
+    private bool _loading = true;
+
+    private bool _logDialogVisible;
+    private Guid? _logTaskId;
+    private string _logTaskTitle = string.Empty;
+    private DateTime? _logCompletedDate;
+    private decimal? _logCost;
+    private string? _logNotes;
+
+    private bool _deleteDialogVisible;
+    private MaintenanceTask? _pendingDeleteTask;
+    private string _deleteMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _properties = await PropertyService.GetAllAsync();
+        await LoadTasksAsync();
+    }
+
+    private async Task OnPropertyChanged(Guid? value)
+    {
+        _selectedPropertyId = value;
+        await LoadTasksAsync();
+    }
+
+    private async Task LoadTasksAsync()
+    {
+        _loading = true;
+        _tasks = await MaintenanceService.GetAllTasksAsync(_selectedPropertyId);
+        _loading = false;
+    }
+
+    private void EditTask(Guid taskId)
+    {
+        Navigation.NavigateTo($"/maintenance/{taskId}/edit");
+    }
+
+    private void OpenLogDialog(MaintenanceTask task)
+    {
+        _logTaskId = task.Id;
+        _logTaskTitle = task.Title;
+        _logCompletedDate = DateTime.Today;
+        _logCost = null;
+        _logNotes = null;
+        _logDialogVisible = true;
+    }
+
+    private void CancelLog()
+    {
+        _logDialogVisible = false;
+        _logTaskId = null;
+    }
+
+    private async Task SubmitLogAsync()
+    {
+        if (_logTaskId is null || _logCompletedDate is null)
+            return;
+
+        var completed = DateOnly.FromDateTime(_logCompletedDate.Value);
+        await MaintenanceService.LogCompletionAsync(_logTaskId.Value, completed, _logCost, _logNotes);
+        _logDialogVisible = false;
+        _logTaskId = null;
+        Snackbar.Add("Completion logged", Severity.Success);
+        await LoadTasksAsync();
+    }
+
+    private Task DeleteTaskAsync(MaintenanceTask task)
+    {
+        _pendingDeleteTask = task;
+        _deleteMessage = $"Delete '{task.Title}'? All completion history will be removed.";
+        _deleteDialogVisible = true;
+        return Task.CompletedTask;
+    }
+
+    private void CancelDelete()
+    {
+        _deleteDialogVisible = false;
+        _pendingDeleteTask = null;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_pendingDeleteTask is null)
+            return;
+
+        await MaintenanceService.DeleteTaskAsync(_pendingDeleteTask.Id);
+        _deleteDialogVisible = false;
+        _pendingDeleteTask = null;
+        await LoadTasksAsync();
+        Snackbar.Add("Task deleted", Severity.Success);
+    }
+
+    private static string FormatInterval(MaintenanceTask task) =>
+        $"Every {task.IntervalValue} {task.Interval.ToString().ToLowerInvariant()}";
+
+    internal static DateOnly ComputeNextDueDate(MaintenanceTask task)
+    {
+        var anchor = task.LastCompletedDate ?? DateOnly.FromDateTime(task.CreatedAt);
+        return task.Interval switch
+        {
+            RecurrenceInterval.Days => anchor.AddDays(task.IntervalValue),
+            RecurrenceInterval.Weeks => anchor.AddDays(task.IntervalValue * 7),
+            RecurrenceInterval.Months => anchor.AddMonths(task.IntervalValue),
+            RecurrenceInterval.Years => anchor.AddYears(task.IntervalValue),
+            _ => anchor
+        };
+    }
+
+    private static (Color Color, string Label) GetStatus(MaintenanceTask task)
+    {
+        var next = ComputeNextDueDate(task);
+        var days = next.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+        if (days < 0)
+            return (Color.Error, "Overdue");
+        if (days <= 14)
+            return (Color.Warning, "Due Soon");
+        return (Color.Success, "OK");
+    }
+}
