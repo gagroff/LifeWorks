@@ -1,3 +1,5 @@
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using LifeWorks.Application;
 using LifeWorks.Application.Services;
 using LifeWorks.Infrastructure;
@@ -6,6 +8,7 @@ using LifeWorks.Web;
 using LifeWorks.Web.Components;
 using LifeWorks.Web.Components.Account;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,8 +37,28 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationServices();
+
+// Configure HSTS for production
+builder.Services.AddHsts(o =>
+{
+    o.MaxAge = TimeSpan.FromDays(365);
+    o.IncludeSubDomains = true;
+});
+
+// Configure Data Protection to persist keys to Azure Blob Storage when available
+var blobConnForDp = builder.Configuration["Storage:BlobConnectionString"];
+if (!string.IsNullOrEmpty(blobConnForDp))
+{
+    var dpBlobServiceClient = new BlobServiceClient(blobConnForDp);
+    var dpContainerClient = dpBlobServiceClient.GetBlobContainerClient("data-protection");
+    dpContainerClient.CreateIfNotExistsAsync(PublicAccessType.None).GetAwaiter().GetResult();
+    var dpBlobClient = dpContainerClient.GetBlobClient("keys.xml");
+    builder.Services.AddDataProtection()
+        .PersistKeysToAzureBlobStorage(dpBlobClient)
+        .SetApplicationName("LifeWorks");
+}
 
 var app = builder.Build();
 
