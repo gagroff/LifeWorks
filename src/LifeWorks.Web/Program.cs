@@ -53,7 +53,7 @@ if (!string.IsNullOrEmpty(blobConnForDp))
 {
     var dpBlobServiceClient = new BlobServiceClient(blobConnForDp);
     var dpContainerClient = dpBlobServiceClient.GetBlobContainerClient("data-protection");
-    dpContainerClient.CreateIfNotExistsAsync(PublicAccessType.None).GetAwaiter().GetResult();
+    await dpContainerClient.CreateIfNotExistsAsync(PublicAccessType.None);
     var dpBlobClient = dpContainerClient.GetBlobClient("keys.xml");
     builder.Services.AddDataProtection()
         .PersistKeysToAzureBlobStorage(dpBlobClient)
