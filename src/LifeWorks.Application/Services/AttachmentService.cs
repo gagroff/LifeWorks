@@ -1,25 +1,24 @@
 using LifeWorks.Application.Repositories;
+using LifeWorks.Application.Storage;
 using LifeWorks.Domain.Entities;
-using Microsoft.Extensions.Configuration;
 
 namespace LifeWorks.Application.Services;
 
-public class AttachmentService(IAttachmentRepository repository, IConfiguration configuration) : IAttachmentService
+public class AttachmentService(IAttachmentRepository repository, IFileStorage fileStorage) : IAttachmentService
 {
-    private string UploadPath => configuration["Attachments:UploadPath"] ?? Path.Combine("wwwroot", "uploads");
-
     public Task<List<Attachment>> GetByImprovementIdAsync(Guid improvementId) =>
         repository.GetByImprovementIdAsync(improvementId);
 
     public async Task<Attachment> SaveAsync(Guid improvementId, string fileName, string contentType, Stream fileStream)
     {
-        Directory.CreateDirectory(UploadPath);
-
         var storedFileName = $"{Guid.NewGuid()}{Path.GetExtension(fileName)}";
-        var fullPath = Path.Combine(UploadPath, storedFileName);
 
-        await using (var dest = File.Create(fullPath))
-            await fileStream.CopyToAsync(dest);
+        using var buffer = new MemoryStream();
+        await fileStream.CopyToAsync(buffer);
+        var fileSize = buffer.Length;
+        buffer.Position = 0;
+
+        await fileStorage.SaveAsync(storedFileName, buffer, contentType);
 
         var attachment = new Attachment
         {
@@ -27,7 +26,7 @@ public class AttachmentService(IAttachmentRepository repository, IConfiguration 
             HomeImprovementId = improvementId,
             FileName = fileName,
             StoredFileName = storedFileName,
-            FileSize = new FileInfo(fullPath).Length,
+            FileSize = fileSize,
             ContentType = contentType,
             UploadedAt = DateTime.UtcNow
         };
@@ -42,8 +41,8 @@ public class AttachmentService(IAttachmentRepository repository, IConfiguration 
         var attachment = await repository.GetByIdAsync(attachmentId)
             ?? throw new FileNotFoundException($"Attachment {attachmentId} not found.");
 
-        var fullPath = Path.Combine(UploadPath, attachment.StoredFileName);
-        return (File.OpenRead(fullPath), attachment);
+        var stream = await fileStorage.OpenReadAsync(attachment.StoredFileName);
+        return (stream, attachment);
     }
 
     public async Task DeleteAsync(Guid attachmentId)
@@ -52,9 +51,7 @@ public class AttachmentService(IAttachmentRepository repository, IConfiguration 
         if (attachment is null)
             return;
 
-        var fullPath = Path.Combine(UploadPath, attachment.StoredFileName);
-        if (File.Exists(fullPath))
-            File.Delete(fullPath);
+        await fileStorage.DeleteAsync(attachment.StoredFileName);
 
         await repository.DeleteAsync(attachment);
         await repository.SaveChangesAsync();
