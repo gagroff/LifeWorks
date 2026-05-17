@@ -26,4 +26,18 @@
             Categories
         </MudNavLink>
     </MudNavGroup>
+
+    <AuthorizeView>
+        <Authorized>
+            <form action="/logout" method="post" style="margin:0">
+                <AntiforgeryToken />
+                <MudNavGroup Title="@context.User.Identity?.Name" Icon="@Icons.Material.Filled.Person" Expanded="false">
+                    <MudNavLink Icon="@Icons.Material.Filled.Logout">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" Color="Color.Default"
+                                   Style="text-align:left;padding:0;min-width:0">Sign out</MudButton>
+                    </MudNavLink>
+                </MudNavGroup>
+            </form>
+        </Authorized>
+    </AuthorizeView>
 </MudNavMenu>

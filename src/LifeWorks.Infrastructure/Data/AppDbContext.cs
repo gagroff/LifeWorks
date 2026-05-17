@@ -1,9 +1,11 @@
 using LifeWorks.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LifeWorks.Infrastructure.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<IdentityUser>(options)
 {
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<Category> Categories => Set<Category>();
@@ -14,24 +16,24 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<MaintenanceTask> MaintenanceTasks => Set<MaintenanceTask>();
     public DbSet<MaintenanceLog> MaintenanceLogs => Set<MaintenanceLog>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
-        modelBuilder.Entity<Property>(e =>
+        builder.Entity<Property>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
             e.Property(x => x.Address).HasMaxLength(500);
         });
 
-        modelBuilder.Entity<Category>(e =>
+        builder.Entity<Category>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Name).HasMaxLength(100).IsRequired();
         });
 
-        modelBuilder.Entity<Contractor>(e =>
+        builder.Entity<Contractor>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
@@ -41,7 +43,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Website).HasMaxLength(500);
         });
 
-        modelBuilder.Entity<HomeImprovement>(e =>
+        builder.Entity<HomeImprovement>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Title).HasMaxLength(300).IsRequired();
@@ -63,7 +65,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
-        modelBuilder.Entity<Attachment>(e =>
+        builder.Entity<Attachment>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.FileName).HasMaxLength(500).IsRequired();
@@ -76,7 +78,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-            modelBuilder.Entity<Asset>(e =>
+            builder.Entity<Asset>(e =>
             {
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Name).HasMaxLength(200).IsRequired();
@@ -93,7 +95,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.Restrict);
             });
 
-        modelBuilder.Entity<MaintenanceTask>(e =>
+        builder.Entity<MaintenanceTask>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Title).HasMaxLength(300).IsRequired();
@@ -105,7 +107,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<MaintenanceLog>(e =>
+        builder.Entity<MaintenanceLog>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Cost).HasPrecision(18, 2);
@@ -116,12 +118,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        SeedData(modelBuilder);
+        SeedData(builder);
     }
 
-    private static void SeedData(ModelBuilder modelBuilder)
+    private static void SeedData(ModelBuilder builder)
     {
-        modelBuilder.Entity<Property>().HasData(
+        builder.Entity<Property>().HasData(
             new Property { Id = new Guid("11111111-0000-0000-0000-000000000001"), Name = "Primary Home", Address = string.Empty, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
             new Property { Id = new Guid("11111111-0000-0000-0000-000000000002"), Name = "Lake House", Address = string.Empty, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
         );
@@ -144,7 +146,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         var seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         int index = 1;
-        modelBuilder.Entity<Category>().HasData(
+        builder.Entity<Category>().HasData(
             categories.Select(c => new Category
             {
                 Id = new Guid($"22222222-0000-0000-0000-{index++:D12}"),

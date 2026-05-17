@@ -1,0 +1,80 @@
+@page "/login"
+@attribute [AllowAnonymous]
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@inject SignInManager<IdentityUser> SignInManager
+@inject NavigationManager NavigationManager
+@inject ILogger<Login> Logger
+
+<PageTitle>Sign In — LifeWorks</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="min-height:100vh">
+    <MudCard Elevation="4" Style="width:100%;max-width:420px;padding:2rem">
+        <MudCardContent>
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-1">LifeWorks</MudText>
+            <MudText Typo="Typo.subtitle1" Align="Align.Center" Color="Color.Secondary" Class="mb-6">Sign in to your home hub</MudText>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@errorMessage</MudAlert>
+            }
+
+            <EditForm Model="Input" OnValidSubmit="LoginAsync" FormName="login">
+                <DataAnnotationsValidator />
+                <MudTextField @bind-Value="Input.Email" Label="Email" InputType="InputType.Email"
+                              Variant="Variant.Outlined" Class="mb-3" For="@(() => Input.Email)" />
+                <MudTextField @bind-Value="Input.Password" Label="Password"
+                              InputType="@(showPassword ? InputType.Text : InputType.Password)"
+                              Variant="Variant.Outlined" Class="mb-3"
+                              For="@(() => Input.Password)"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@(showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                              OnAdornmentClick="@(() => showPassword = !showPassword)" />
+                <MudCheckBox @bind-Value="Input.RememberMe" Label="Remember me" Class="mb-4" />
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
+                           FullWidth="true" Size="Size.Large">Sign In</MudButton>
+            </EditForm>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private string? errorMessage;
+    private bool showPassword;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Input ??= new();
+    }
+
+    private async Task LoginAsync()
+    {
+        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        if (result.Succeeded)
+        {
+            Logger.LogInformation("User logged in.");
+            NavigationManager.NavigateTo(ReturnUrl ?? "/");
+        }
+        else
+        {
+            errorMessage = "Invalid email or password.";
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        public string Password { get; set; } = "";
+
+        public bool RememberMe { get; set; }
+    }
+}

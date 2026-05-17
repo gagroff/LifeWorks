@@ -20,7 +20,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\LifeWorks.Application\LifeWorks.Application.csproj" />
+    <ProjectReference Include="..\..\src\LifeWorks.Infrastructure\LifeWorks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\LifeWorks.Web\LifeWorks.Web.csproj" />
   </ItemGroup>
 
 </Project>

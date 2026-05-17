@@ -2,7 +2,12 @@ using LifeWorks.Application;
 using LifeWorks.Application.Services;
 using LifeWorks.Infrastructure;
 using LifeWorks.Infrastructure.Data;
+using LifeWorks.Web;
 using LifeWorks.Web.Components;
+using LifeWorks.Web.Components.Account;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 
@@ -15,6 +20,20 @@ builder.Services.AddMudServices();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// No registration endpoint — accounts are seeded only
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+    {
+        options.Password.RequiredLength = 12;
+        options.Password.RequireNonAlphanumeric = true;
+        options.SignIn.RequireConfirmedAccount = false;
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
 builder.Services.AddInfrastructure();
 builder.Services.AddApplicationServices();
 
@@ -24,6 +43,9 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await context.Database.MigrateAsync();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await IdentitySeeder.SeedAsync(userManager, config);
 }
 
 // Configure the HTTP request pipeline.
@@ -35,6 +57,9 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAntiforgery();
 
@@ -54,5 +79,11 @@ app.MapGet("/attachments/{id:guid}/download", async (Guid id, IAttachmentService
         return Results.NotFound();
     }
 });
+
+app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, [FromForm] string? returnUrl) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.LocalRedirect(returnUrl ?? "/login");
+}).RequireAuthorization();
 
 app.Run();
