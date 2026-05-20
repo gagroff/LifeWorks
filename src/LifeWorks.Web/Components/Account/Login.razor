@@ -1,10 +1,6 @@
 @page "/login"
 @attribute [AllowAnonymous]
-@using Microsoft.AspNetCore.Identity
-@using System.ComponentModel.DataAnnotations
-@inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager NavigationManager
-@inject ILogger<Login> Logger
 
 <PageTitle>Sign In — LifeWorks</PageTitle>
 
@@ -19,63 +15,32 @@
                 <MudAlert Severity="Severity.Error" Class="mb-4">@errorMessage</MudAlert>
             }
 
-            <EditForm Model="Input" OnValidSubmit="LoginAsync" FormName="login">
-                <DataAnnotationsValidator />
-                <MudTextField @bind-Value="Input.Email" Label="Email" InputType="InputType.Email"
-                              Variant="Variant.Outlined" Class="mb-3" For="@(() => Input.Email)" />
-                <MudTextField @bind-Value="Input.Password" Label="Password"
-                              InputType="@(showPassword ? InputType.Text : InputType.Password)"
-                              Variant="Variant.Outlined" Class="mb-3"
-                              For="@(() => Input.Password)"
-                              Adornment="Adornment.End"
-                              AdornmentIcon="@(showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
-                              OnAdornmentClick="@(() => showPassword = !showPassword)" />
-                <MudCheckBox @bind-Value="Input.RememberMe" Label="Remember me" Class="mb-4" />
+            @* Posts to a minimal API endpoint — bypasses Blazor streaming SSR so Set-Cookie works *@
+            <form method="post" action="/account/login" data-enhance="false">
+                <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                <div class="mb-3">
+                    <label for="login-email" style="display:block;margin-bottom:4px;font-weight:500">Email</label>
+                    <input id="login-email" name="email" type="email" required
+                           autocomplete="username"
+                           style="width:100%;border:1px solid rgba(0,0,0,0.23);border-radius:4px;padding:14px;font-size:1rem;box-sizing:border-box" />
+                </div>
+                <div class="mb-3">
+                    <label for="login-password" style="display:block;margin-bottom:4px;font-weight:500">Password</label>
+                    <input id="login-password" name="password" type="password" required
+                           autocomplete="current-password"
+                           style="width:100%;border:1px solid rgba(0,0,0,0.23);border-radius:4px;padding:14px;font-size:1rem;box-sizing:border-box" />
+                </div>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
-                           FullWidth="true" Size="Size.Large">Sign In</MudButton>
-            </EditForm>
+                           FullWidth="true" Size="Size.Large" Class="mt-2">Sign In</MudButton>
+            </form>
         </MudCardContent>
     </MudCard>
 </MudContainer>
 
 @code {
-    private string? errorMessage;
-    private bool showPassword;
-
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
-    [SupplyParameterFromForm]
-    private InputModel Input { get; set; } = null!;
-
-    protected override void OnInitialized()
-    {
-        Input ??= new();
-    }
-
-    private async Task LoginAsync()
-    {
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
-        if (result.Succeeded)
-        {
-            Logger.LogInformation("User logged in.");
-            var destination = Uri.IsWellFormedUriString(ReturnUrl, UriKind.Relative) ? ReturnUrl : "/";
-            NavigationManager.NavigateTo(destination);
-        }
-        else
-        {
-            errorMessage = "Invalid email or password.";
-        }
-    }
-
-    private sealed class InputModel
-    {
-        [Required, EmailAddress]
-        public string Email { get; set; } = "";
-
-        [Required]
-        public string Password { get; set; } = "";
-
-        public bool RememberMe { get; set; }
-    }
+    // Show error if redirected back from /account/login with ?error=invalid
+    private string? errorMessage => NavigationManager.Uri.Contains("error=invalid") ? "Invalid email or password." : null;
 }

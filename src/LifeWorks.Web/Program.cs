@@ -108,6 +108,26 @@ app.MapGet("/attachments/{id:guid}/download", async (Guid id, IAttachmentService
     }
 });
 
+// Minimal API login — bypasses Blazor streaming SSR so Set-Cookie works in a real browser POST
+app.MapPost("/account/login", async (
+    SignInManager<IdentityUser> signInManager,
+    [FromForm] string? email,
+    [FromForm] string? password,
+    [FromForm] string? returnUrl,
+    HttpContext httpContext) =>
+{
+    if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        return Results.Redirect("/login?error=invalid");
+
+    var result = await signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: true);
+    if (result.Succeeded)
+    {
+        var dest = Uri.IsWellFormedUriString(returnUrl, UriKind.Relative) ? returnUrl : "/";
+        return Results.Redirect(dest);
+    }
+    return Results.Redirect("/login?error=invalid");
+}).AllowAnonymous().DisableAntiforgery();
+
 app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, [FromForm] string? returnUrl) =>
 {
     await signInManager.SignOutAsync();
