@@ -1,0 +1,46 @@
+@page "/login"
+@attribute [AllowAnonymous]
+@inject NavigationManager NavigationManager
+
+<PageTitle>Sign In — LifeWorks</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center" Style="min-height:100vh">
+    <MudCard Elevation="4" Style="width:100%;max-width:420px;padding:2rem">
+        <MudCardContent>
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-1">LifeWorks</MudText>
+            <MudText Typo="Typo.subtitle1" Align="Align.Center" Color="Color.Secondary" Class="mb-6">Sign in to your home hub</MudText>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@errorMessage</MudAlert>
+            }
+
+            @* Posts to a minimal API endpoint — bypasses Blazor streaming SSR so Set-Cookie works *@
+            <form method="post" action="/account/login" data-enhance="false">
+                <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                <div class="mb-3">
+                    <label for="login-email" style="display:block;margin-bottom:4px;font-weight:500">Email</label>
+                    <input id="login-email" name="email" type="email" required
+                           autocomplete="username"
+                           style="width:100%;border:1px solid rgba(0,0,0,0.23);border-radius:4px;padding:14px;font-size:1rem;box-sizing:border-box" />
+                </div>
+                <div class="mb-3">
+                    <label for="login-password" style="display:block;margin-bottom:4px;font-weight:500">Password</label>
+                    <input id="login-password" name="password" type="password" required
+                           autocomplete="current-password"
+                           style="width:100%;border:1px solid rgba(0,0,0,0.23);border-radius:4px;padding:14px;font-size:1rem;box-sizing:border-box" />
+                </div>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
+                           FullWidth="true" Size="Size.Large" Class="mt-2">Sign In</MudButton>
+            </form>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    // Show error if redirected back from /account/login with ?error=invalid
+    private string? errorMessage => NavigationManager.Uri.Contains("error=invalid") ? "Invalid email or password." : null;
+}

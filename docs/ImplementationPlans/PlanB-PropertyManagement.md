@@ -83,9 +83,9 @@ The `Property` entity, `PropertyService`, `IPropertyRepository`, and `PropertyRe
 
 - [x] `dotnet build` — no warnings
 - [x] `dotnet test` — all tests pass (25 passed)
-- [ ] `dotnet run --project src/LifeWorks.Web`:
-  - [ ] Navigate to Settings > Properties — list renders
-  - [ ] Add a new property — confirm it appears in the dropdown on the Improvements form
-  - [ ] Edit a property name — confirm change persists
-  - [ ] Attempt to delete a property with linked improvements — confirm error message
-  - [ ] Delete a property with no improvements — confirm it's removed
+- [x] `dotnet run --project src/LifeWorks.Web`:
+  - [x] Navigate to Settings > Properties — list renders
+  - [x] Add a new property — confirm it appears in the dropdown on the Improvements form
+  - [x] Edit a property name — confirm change persists
+  - [x] Attempt to delete a property with linked improvements — confirm error message
+  - [x] Delete a property with no improvements — confirm it's removed

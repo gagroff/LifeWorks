@@ -1,13 +1,27 @@
+using Azure.Storage.Blobs;
 using LifeWorks.Application.Repositories;
+using LifeWorks.Application.Storage;
 using LifeWorks.Infrastructure.Repositories;
+using LifeWorks.Infrastructure.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LifeWorks.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        var blobConnectionString = configuration["Storage:BlobConnectionString"];
+        if (!string.IsNullOrEmpty(blobConnectionString))
+        {
+            services.AddSingleton(new BlobServiceClient(blobConnectionString));
+            services.AddSingleton<IFileStorage, BlobFileStorage>();
+        }
+        else
+        {
+            services.AddSingleton<IFileStorage, LocalFileStorage>();
+        }
         services.AddScoped<IAssetRepository, AssetRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IContractorRepository, ContractorRepository>();

@@ -1,33 +1,20 @@
 using LifeWorks.Application.Repositories;
 using LifeWorks.Application.Services;
+using LifeWorks.Application.Storage;
 using LifeWorks.Domain.Entities;
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
 
 namespace LifeWorks.Application.Tests;
 
-public class AttachmentServiceTests : IDisposable
+public class AttachmentServiceTests
 {
     private readonly IAttachmentRepository _repo = Substitute.For<IAttachmentRepository>();
-    private readonly string _uploadPath;
+    private readonly IFileStorage _fileStorage = Substitute.For<IFileStorage>();
     private readonly AttachmentService _sut;
 
     public AttachmentServiceTests()
     {
-        _uploadPath = Path.Combine(Path.GetTempPath(), "lifeworks-tests-" + Guid.NewGuid());
-        Directory.CreateDirectory(_uploadPath);
-
-        var config = Substitute.For<IConfiguration>();
-        config["Attachments:UploadPath"].Returns(_uploadPath);
-
-        _sut = new AttachmentService(_repo, config);
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_uploadPath))
-            Directory.Delete(_uploadPath, recursive: true);
-        GC.SuppressFinalize(this);
+        _sut = new AttachmentService(_repo, _fileStorage);
     }
 
     [Fact]
@@ -48,16 +35,18 @@ public class AttachmentServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task SaveAsync_WritesFileToDisk()
+    public async Task SaveAsync_DelegatesToFileStorage()
     {
         var content = "hello world"u8.ToArray();
         using var stream = new MemoryStream(content);
 
         var result = await _sut.SaveAsync(Guid.NewGuid(), "note.txt", "text/plain", stream);
 
-        var fullPath = Path.Combine(_uploadPath, result.StoredFileName);
-        Assert.True(File.Exists(fullPath));
-        Assert.Equal(content, await File.ReadAllBytesAsync(fullPath));
+        await _fileStorage.Received(1).SaveAsync(
+            result.StoredFileName,
+            Arg.Any<Stream>(),
+            "text/plain",
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -72,28 +61,20 @@ public class AttachmentServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteAsync_RemovesFileFromDisk()
+    public async Task DeleteAsync_DelegatesToFileStorage()
     {
-        var fileName = Guid.NewGuid() + ".pdf";
-        var fullPath = Path.Combine(_uploadPath, fileName);
-        await File.WriteAllTextAsync(fullPath, "content");
-
-        var attachment = new Attachment { Id = Guid.NewGuid(), StoredFileName = fileName };
+        var attachment = new Attachment { Id = Guid.NewGuid(), StoredFileName = "stored.pdf" };
         _repo.GetByIdAsync(attachment.Id).Returns(attachment);
 
         await _sut.DeleteAsync(attachment.Id);
 
-        Assert.False(File.Exists(fullPath));
+        await _fileStorage.Received(1).DeleteAsync("stored.pdf", Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task DeleteAsync_DeletesRecordViaRepository()
     {
-        var fileName = Guid.NewGuid() + ".pdf";
-        var fullPath = Path.Combine(_uploadPath, fileName);
-        await File.WriteAllTextAsync(fullPath, "content");
-
-        var attachment = new Attachment { Id = Guid.NewGuid(), StoredFileName = fileName };
+        var attachment = new Attachment { Id = Guid.NewGuid(), StoredFileName = "stored.pdf" };
         _repo.GetByIdAsync(attachment.Id).Returns(attachment);
 
         await _sut.DeleteAsync(attachment.Id);
@@ -110,6 +91,7 @@ public class AttachmentServiceTests : IDisposable
         await _sut.DeleteAsync(Guid.NewGuid());
 
         await _repo.DidNotReceive().DeleteAsync(Arg.Any<Attachment>());
+        await _fileStorage.DidNotReceive().DeleteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
