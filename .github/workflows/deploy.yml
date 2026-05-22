@@ -30,9 +30,18 @@ jobs:
       - name: Publish
         run: dotnet publish src/LifeWorks.Web/LifeWorks.Web.csproj --configuration Release --output ./publish --no-build
 
-      - name: Deploy
-        uses: azure/webapps-deploy@v3
+      - name: Zip publish output
+        run: cd ./publish && zip -r ../app.zip .
+
+      - name: Azure Login
+        uses: azure/login@v2
         with:
-          app-name: lifeworks-${{ vars.AZURE_SUFFIX }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./publish
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        run: |
+          az webapp deploy \
+            --name lifeworks-${{ vars.AZURE_SUFFIX }} \
+            --resource-group lifeworks-rg \
+            --src-path app.zip \
+            --type zip
