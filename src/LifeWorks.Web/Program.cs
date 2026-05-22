@@ -79,7 +79,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
+// HTTPS redirect is handled by Azure App Service (https-only: true) at the infrastructure level.
+// Keeping UseHttpsRedirection here causes an infinite redirect loop because App Service forwards
+// requests to the app as HTTP internally even after TLS termination.
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
