@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local attachment uploads (dev/test runtime data)
+src/LifeWorks.Web/wwwroot/uploads/

@@ -87,33 +87,32 @@ Home improvement records are only as useful as the proof behind them — receipt
 
 ## Phase 3 — Web Layer: Upload/Download UI
 
-- [ ] **Task C3.1** — Include Attachments in `GetWithDetailsAsync`
+- [x] **Task C3.1** — Include Attachments in `GetWithDetailsAsync`
   - **File:** `src/LifeWorks.Infrastructure/Repositories/HomeImprovementRepository.cs`
   - Add `.Include(h => h.Attachments)` to the `GetWithDetailsAsync` query
 
-- [ ] **Task C3.2** — Add Attachments panel to Improvement Detail page
-  - **File:** `src/LifeWorks.Web/Components/Pages/Improvements/` (detail page)
+- [x] **Task C3.2** — Add Attachments panel to Improvement Detail page
+  - **File:** `src/LifeWorks.Web/Components/Pages/Improvements/ImprovementDetail.razor` (+ `.razor.cs`)
   - Add a `MudCard` or `MudExpansionPanel` labeled "Attachments"
   - List existing attachments: file name, size, upload date, download button, delete button
   - `MudFileUpload` for new uploads (accept images + PDFs)
   - On upload: call `IAttachmentService.SaveAsync`, refresh list
   - On delete: show confirmation dialog → call `IAttachmentService.DeleteAsync`, refresh list
 
-- [ ] **Task C3.3** — Add attachment download endpoint
-  - **File:** `src/LifeWorks.Web/` — minimal API endpoint at `/attachments/{id}/download`
+- [x] **Task C3.3** — Add attachment download endpoint
+  - **File:** `src/LifeWorks.Web/Program.cs` — minimal API endpoint at `/attachments/{id}/download`
   - Call `IAttachmentService.GetFileAsync`, return `FileStreamResult` with correct `ContentType` and `Content-Disposition: attachment`
 
-- [ ] **Task C3.4** — Show attachment count badge on Improvements list
-  - **File:** `src/LifeWorks.Web/Components/Pages/Improvements/` (index/list page)
+- [x] **Task C3.4** — Show attachment count badge on Improvements list
+  - **File:** `src/LifeWorks.Web/Components/Pages/Improvements/Index.razor`
   - Add a small chip/badge showing attachment count per row
-  - Update `GetFilteredAsync` or use a count projection in the repository to avoid N+1
 
 ---
 
 ## Phase 4 — Tests
 
-- [ ] **Task C4.1** — Unit tests for `AttachmentService`
-  - **File:** `tests/LifeWorks.Application.Tests/Services/AttachmentServiceTests.cs`
+- [x] **Task C4.1** — Unit tests for `AttachmentService`
+  - **File:** `tests/LifeWorks.Application.Tests/AttachmentServiceTests.cs` (implemented at the test project root, not the `Services/` subfolder named in the original plan)
   - `SaveAsync` creates correct `Attachment` record and writes to expected path
   - `DeleteAsync` removes both DB record and file from disk
   - `GetByImprovementIdAsync` returns correct records for the given improvement
@@ -122,12 +121,12 @@ Home improvement records are only as useful as the proof behind them — receipt
 
 ## Verification
 
-- [ ] `dotnet build` — no warnings
-- [ ] Migration applies cleanly: `dotnet ef database update ...`
-- [ ] `dotnet test` — all tests pass
-- [ ] `dotnet run --project src/LifeWorks.Web`:
-  - [ ] Open an improvement detail page — Attachments panel renders
-  - [ ] Upload a PDF receipt — confirm it appears with correct name and file size
-  - [ ] Click download — file downloads with correct content type
-  - [ ] Delete the attachment — disappears from list, file removed from disk
-  - [ ] Confirm improvement list shows attachment count badge per row
+- [x] `dotnet build` — no warnings
+- [x] Migration applies cleanly: `dotnet ef database update ...` (confirmed via app startup `MigrateAsync()`: "No migrations were applied. The database is already up to date.")
+- [x] `dotnet test` — all tests pass (7/7 `AttachmentServiceTests`)
+- [x] `dotnet run --project src/LifeWorks.Web`, verified via Playwright E2E (`tests/LifeWorks.PlaywrightTests/AttachmentsTests.cs`, 4/4 passing):
+  - [x] Open an improvement detail page — Attachments panel renders
+  - [x] Upload a PDF receipt — confirm it appears with correct name and file size
+  - [x] Click download — file downloads with correct content type (`application/pdf` + matching `Content-Disposition`)
+  - [x] Delete the attachment — disappears from list, empty state ("No attachments yet.") returns
+  - [x] Confirm improvement list shows attachment count badge per row

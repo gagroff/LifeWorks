@@ -78,21 +78,6 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     await IdentitySeeder.SeedAsync(userManager, config);
-
-    // TEMPORARY PASSWORD RESET — remove this block after logging in once.
-    // Resets the password for the account below using the Identity hasher and token flow.
-    const string resetEmail = "gregagroff@gmail.com";
-    const string resetPassword = "LifeWorks!2026Reset";
-    var resetUser = await userManager.FindByEmailAsync(resetEmail);
-    if (resetUser is not null)
-    {
-        var resetToken = await userManager.GeneratePasswordResetTokenAsync(resetUser);
-        var resetResult = await userManager.ResetPasswordAsync(resetUser, resetToken, resetPassword);
-        if (!resetResult.Succeeded)
-            throw new InvalidOperationException(
-                $"Failed to reset password for {resetEmail}: {string.Join(", ", resetResult.Errors.Select(e => e.Description))}");
-    }
-    // END TEMPORARY PASSWORD RESET
 }
 
 // Configure the HTTP request pipeline.

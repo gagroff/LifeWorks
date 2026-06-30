@@ -14,6 +14,23 @@ public class ImprovementsTests : PageTest
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
+    private async Task LoginAsync()
+    {
+        var resp = await Page.APIRequest.PostAsync($"{BaseUrl}/account/login", new()
+        {
+            DataString = "email=dev%40lifeworks.local&password=DevPassword123%21",
+            Headers = new Dictionary<string, string>
+            {
+                ["Content-Type"] = "application/x-www-form-urlencoded"
+            }
+        });
+        Console.WriteLine($"Login API response: {resp.Status}");
+        await Page.GotoAsync("/");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        if (Page.Url.Contains("/login"))
+            throw new InvalidOperationException($"Login failed — still at {Page.Url}");
+    }
+
     private async Task<string> CreateImprovement(string title, string? cost = null)
     {
         await Page.GotoAsync("/improvements/new");
@@ -57,7 +74,7 @@ public class ImprovementsTests : PageTest
             await costInput.PressAsync("Tab");
         }
 
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
         await Page.WaitForURLAsync("**/improvements", new() { Timeout = 15000 });
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -69,6 +86,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task ImprovementsListPage_Loads()
     {
+        await LoginAsync();
         await Page.GotoAsync("/improvements");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -79,6 +97,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task NavMenu_ImprovementsLinkWorks()
     {
+        await LoginAsync();
         await Page.GotoAsync("/improvements");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -92,6 +111,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task CreateImprovement_WithCost_AppearsInList()
     {
+        await LoginAsync();
         var title = $"Roof Repair {Guid.NewGuid():N}";
         await CreateImprovement(title, cost: "1500");
 
@@ -102,6 +122,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task CreateDiyImprovement_NoCost_ShowsDiyLabel()
     {
+        await LoginAsync();
         var title = $"DIY Paint {Guid.NewGuid():N}";
         await CreateImprovement(title);
 
@@ -114,6 +135,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task RunningTotal_IsDisplayedOnListPage()
     {
+        await LoginAsync();
         await Page.GotoAsync("/improvements");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -123,6 +145,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task FilterApplyAndClear_DoesNotError()
     {
+        await LoginAsync();
         await Page.GotoAsync("/improvements");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -142,6 +165,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task EditImprovement_FormPrePopulates_AndSaves()
     {
+        await LoginAsync();
         var original = $"Edit Me {Guid.NewGuid():N}";
         var updated = $"Edited {Guid.NewGuid():N}";
         await CreateImprovement(original);
@@ -168,7 +192,7 @@ public class ImprovementsTests : PageTest
         // Update title
         await titleField.ClickAsync();
         await titleField.FillAsync(updated);
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
         await Page.WaitForURLAsync("**/improvements");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -178,6 +202,7 @@ public class ImprovementsTests : PageTest
     [Test]
     public async Task DetailView_ShowsImprovementInfo()
     {
+        await LoginAsync();
         var title = $"Detail Test {Guid.NewGuid():N}";
         await CreateImprovement(title, cost: "250");
 
@@ -190,15 +215,18 @@ public class ImprovementsTests : PageTest
 
         await Page.WaitForURLAsync(new Regex(@"/improvements/[0-9a-f\-]+$"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Page.Locator("h4")).ToContainTextAsync("Improvement Details", new() { Timeout = 10000 });
 
         await Expect(Page.Locator($"text={title}")).ToBeVisibleAsync();
-        // No contractor selected — should show DIY section
-        await Expect(Page.Locator("text=DIY")).ToBeVisibleAsync();
+        // No contractor selected — should show DIY section (exact phrase to avoid matching
+        // "DIY" cells left over from other rows on the list page)
+        await Expect(Page.Locator("text=DIY (no contractor)")).ToBeVisibleAsync();
     }
 
     [Test]
     public async Task DeleteImprovement_RemovesFromList()
     {
+        await LoginAsync();
         var title = $"To Delete {Guid.NewGuid():N}";
         await CreateImprovement(title);
 
