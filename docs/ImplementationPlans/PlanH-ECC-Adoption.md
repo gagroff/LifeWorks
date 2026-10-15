@@ -28,15 +28,17 @@
 
 > **Goal:** CI is trustworthy, `main` is protected, and Superpowers is off for this repo. No AI tooling changes yet.
 
-### 0.1 — Make CI green and meaningful
+### 0.1 — Make CI green and meaningful ✅ (#15)
 
-CI on `main` was green through June 30, 2026. The first run since then (on the Plan H docs PR, which changes no code) **fails at "Restore dependencies"**, before build or tests. Something outside the repo changed: the .NET 10 SDK version CI picks up, a NuGet package, or a new vulnerability advisory. With `TreatWarningsAsErrors` on, a new NuGet audit warning (NU1901–NU1904) would fail restore. That's the leading suspect, but it's unconfirmed.
+CI on `main` was green through June 30, 2026, then started failing at **Restore dependencies**. The cause: the 2026-10-13 .NET security release published advisories against transitive `System.Security.Cryptography.Pkcs` (9.0.4/10.0.7) and `.Xml` (10.0.7). NuGet audit raised NU1902/NU1903, and `TreatWarningsAsErrors` turned them into restore errors.
 
-- [ ] Open the failed run on the Actions tab and read the **Restore dependencies** step log. Note the exact error code.
-- [ ] Reproduce locally: `dotnet restore` from a clean clone. If it's an NU190x audit warning, upgrade the affected package. Don't suppress the warning.
-- [ ] If it's SDK drift, pin the SDK with a `global.json`, so CI and your machine use the same version.
-- [ ] Separately, check whether the Playwright project actually runs in CI. `ci.yml` runs `dotnet test` on the whole solution, and those tests call `http://localhost:5053`. If they run, make the intent explicit (exclude them from CI, or start the app first). `deploy.yml` already runs only the two unit-test projects.
-- [ ] Update the CLAUDE.md "Run all tests" note to say which test projects need the app running.
+- [x] Read the **Restore dependencies** log: NU1902/NU1903 on the two crypto packages.
+- [x] Pin the patched 10.0.13 versions in the flagged projects (Infrastructure, Web, Application.Tests). The audit stays on, and nothing is suppressed. (#15)
+- [x] ~~SDK drift / `global.json`~~: not the cause.
+- [x] Playwright in CI: `LifeWorks.PlaywrightTests` isn't in `LifeWorks.slnx`, so CI never runs it. No change needed.
+- [ ] Update the CLAUDE.md test commands: Playwright tests aren't in the solution, and they need the app running on port 5053 (`dotnet test tests/LifeWorks.PlaywrightTests`).
+
+> **Expect this monthly.** Microsoft ships .NET security fixes on Patch Tuesday, and with warnings-as-errors any new advisory turns CI red overnight, even with no code change. The durable fix is in Phase 2 (bump the `Microsoft.*` 10.0.7 packages to current servicing, then remove the pins). Consider enabling Dependabot for NuGet so the update arrives as a PR instead of a red build.
 
 ### 0.2 — Protect `main`
 
@@ -150,6 +152,7 @@ In `.claude/commands/`. Each is a short Markdown prompt. Details of what each mu
 
 - [ ] **Clean stray debug artifacts:** remove `tests/*.png` and `tests/*.html`, and add patterns to `.gitignore`.
 - [ ] **Align test package versions:** `Microsoft.NET.Test.Sdk` (17.14.0 vs 18.5.1) and `coverlet.collector` (6.0.4 vs 10.0.0) differ across test projects.
+- [ ] **Bump the `Microsoft.*` packages** (EF Core, Identity, Extensions) from 10.0.7 to current 10.0.x servicing, then remove the temporary crypto pins from #15. Restore must stay clean with the pins gone.
 - [ ] **Fix doc drift:** CLAUDE.md says MudBlazor 9.3.0 (the csproj has 9.4.0), and its Domain entity list is out of date. Also reconcile stale checkboxes in older plan docs, or mark those plans complete.
 - [ ] **A small bug fix**, from your own notes, done test-first.
 - [ ] **One real feature slice**, from PRD §4 (Future Phases) or the remaining items in `PlanDEF`. Keep it to one entity or page.
