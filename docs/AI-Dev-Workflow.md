@@ -207,6 +207,6 @@ These specs are what each `.claude/commands/lw-*.md` file must do. If a command 
 | It wants to convert entities to records or add FluentAssertions | The ECC rules are leaking through. Point it at `lifeworks-overrides.md`, and make that rule more explicit. |
 | Tests pass but don't test the behavior | Ask: "show me the RED output for this test." If there isn't one, the test is redone. |
 | Build fails only in CI | CI runs `-c Release` on Windows. Run the same locally: `dotnet build -c Release`. |
-| Playwright tests fail | They need the app running on port 5053 and aren't part of CI. Start the app first. |
+| Playwright tests fail | They need the app running on port 5053. Start the app first. |
 | Session got long and sloppy | `/clear` or start a new session, then resume from the plan doc. |
 | Superpowers skills show up again | Check `/plugin`, and confirm it's disabled in `.claude/settings.json`. |

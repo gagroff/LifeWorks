@@ -30,17 +30,13 @@
 
 ### 0.1 — Make CI green and meaningful
 
-The Playwright tests call `http://localhost:5053`, but `ci.yml` runs `dotnet test` on the whole solution with no app running. That likely fails or hangs. `deploy.yml` already runs only the two unit-test projects.
+CI on `main` was green through June 30, 2026. The first run since then (on the Plan H docs PR, which changes no code) **fails at "Restore dependencies"**, before build or tests. Something outside the repo changed: the .NET 10 SDK version CI picks up, a NuGet package, or a new vulnerability advisory. With `TreatWarningsAsErrors` on, a new NuGet audit warning (NU1901–NU1904) would fail restore. That's the leading suspect, but it's unconfirmed.
 
-- [ ] Check the last few runs on the Actions tab. Confirm whether CI is currently red, and why.
-- [ ] Change `ci.yml` to run only the unit-test projects (match `deploy.yml`):
-  ```yaml
-  - name: Test
-    run: |
-      dotnet test tests/LifeWorks.Application.Tests --no-build --configuration Release --verbosity normal
-      dotnet test tests/LifeWorks.Domain.Tests --no-build --configuration Release --verbosity normal
-  ```
-- [ ] Note in CLAUDE.md that Playwright tests are local-only and need the app running on port 5053.
+- [ ] Open the failed run on the Actions tab and read the **Restore dependencies** step log. Note the exact error code.
+- [ ] Reproduce locally: `dotnet restore` from a clean clone. If it's an NU190x audit warning, upgrade the affected package. Don't suppress the warning.
+- [ ] If it's SDK drift, pin the SDK with a `global.json`, so CI and your machine use the same version.
+- [ ] Separately, check whether the Playwright project actually runs in CI. `ci.yml` runs `dotnet test` on the whole solution, and those tests call `http://localhost:5053`. If they run, make the intent explicit (exclude them from CI, or start the app first). `deploy.yml` already runs only the two unit-test projects.
+- [ ] Update the CLAUDE.md "Run all tests" note to say which test projects need the app running.
 
 ### 0.2 — Protect `main`
 
